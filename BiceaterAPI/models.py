@@ -4,4 +4,5 @@ from django.db import models
 
 
 class Rest(models.Model):
-    pass
+    first_name = models.CharField(max_length=30, default='Jose')
+    last_name = models.CharField(max_length=30, default='Martin')
