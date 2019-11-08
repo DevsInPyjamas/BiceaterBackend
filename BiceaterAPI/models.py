@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class User(models.Model):
     MALE = 'M'
     FEMALE = 'F'
@@ -38,4 +39,4 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    stop_id = models.IntegerField()
+    bike_hire_docking_station_id = models.CharField(max_length=100)
