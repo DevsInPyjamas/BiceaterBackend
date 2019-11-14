@@ -3,5 +3,7 @@ from BiceaterAPI import views
 
 urlpatterns = [
     url(r'^users$', views.all_users, name='All users'),
-    url(r'^users/(?P<user_input>\w{0,50})/$', views.users_by_username, name='Users by username')
+    url(r'^users/(?P<user_input>\w{0,50})/$', views.users_by_username, name='Users by username'),
+    url(r'^comments$', views.all_comments, name='All comments'),
+    url(r'^comments/(?P<user_input>\w{0,50})/$', views.comments_by_username, name='Comments by username')
 ]
