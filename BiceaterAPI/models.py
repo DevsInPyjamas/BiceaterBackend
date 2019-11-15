@@ -71,7 +71,7 @@ class Comment(models.Model):
         }
 
     def __str__(self):
-        return self.author.username+": "+self.comment_id
+        return self.author.username+": "+self.comment_id.__str__()
 
 
 class Rating(models.Model):
@@ -95,4 +95,4 @@ class Rating(models.Model):
         }
 
     def __str__(self):
-        return self.author.username+": "+self.rating_id
+        return self.author.username+": "+self.rating_id.__str__()
