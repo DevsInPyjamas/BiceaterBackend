@@ -36,7 +36,7 @@ def comments_by_username(request):
     if request.method == 'GET' and 'input' in request.GET:
         user_input = request.GET.get("input", '')
     if user_input:
-        query_response = Comment.objects.get(author=User.objects.get(username=user_input))
+        query_response = Comment.objects.filter(author=User.objects.get(username=user_input))
         dicted_response = [i.to_dict() for i in query_response]
         return HttpResponse(dicted_response, content_type='json')
     else:
