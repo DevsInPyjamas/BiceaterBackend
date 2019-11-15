@@ -17,7 +17,7 @@ class User(models.Model):
     name = models.CharField(max_length=50, default='')
     surname = models.CharField(max_length=50, blank=True)
     DoB = models.DateField(null=True)
-    image = models.ImageField(blank=True, upload_to='profile_images', default='/media/')
+    image = models.ImageField(blank=True, upload_to='profile_images', default='../media/')
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
@@ -38,6 +38,9 @@ class User(models.Model):
             'genre': self.genre
         }
 
+    def __str__(self):
+        return self.username
+
 
 class Comment(models.Model):
     comment_id = models.BigAutoField(primary_key=True)
@@ -50,6 +53,7 @@ class Comment(models.Model):
     answers_to = models.ForeignKey(
         'BiceaterAPI.Comment',
         on_delete=models.CASCADE,
+        blank=True,
         null=True
     )
     bike_hire_docking_station_id = models.CharField(max_length=100,
@@ -65,6 +69,9 @@ class Comment(models.Model):
             'bike_hire_docking_station_id':
                 self.bike_hire_docking_station_id
         }
+
+    def __str__(self):
+        return self.author.username+": "+self.comment_id.__str__()
 
 
 class Rating(models.Model):
@@ -86,3 +93,6 @@ class Rating(models.Model):
             'bike_hire_docking_station_id':
                 self.bike_hire_docking_station_id
         }
+
+    def __str__(self):
+        return self.author.username+": "+self.rating_id.__str__()
