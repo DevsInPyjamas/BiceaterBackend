@@ -17,7 +17,7 @@ class User(models.Model):
     name = models.CharField(max_length=50, default='')
     surname = models.CharField(max_length=50, blank=True)
     DoB = models.DateField(null=True)
-    image = models.ImageField(null=True)
+    image = models.ImageField(blank=True, upload_to='profile_images', default='/media/')
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
@@ -33,7 +33,7 @@ class User(models.Model):
             'name': self.name,
             'surname': self.surname,
             'DoB': str(self.DoB),
-            'image': self.image,
+            'image': self.image.path,
             'description': self.description,
             'genre': self.genre
         }

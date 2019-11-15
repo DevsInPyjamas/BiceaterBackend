@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.urls import path
+
 from BiceaterAPI import views
 
 urlpatterns = [
@@ -6,4 +8,5 @@ urlpatterns = [
     url(r'^users/(?P<user_input>\w{0,50})/$', views.users_by_username, name='Users by username'),
     url(r'^comments$', views.all_comments, name='All comments'),
     url(r'^comments/(?P<user_input>\w{0,50})/$', views.comments_by_username, name='Comments by username')
+    url(r'^users(?P<user_id>[0-9]+)$', views.users_by_id, name='Users by ID'),
 ]
