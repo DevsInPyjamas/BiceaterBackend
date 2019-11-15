@@ -35,6 +35,22 @@ def users_by_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
+def all_comments(request):
+    query_response = Comment.objects.all()
+    dicted_response = [i.to_dict() for i in query_response]
+    return HttpResponse(dicted_response, content_type='json')
+
+
+def comments_by_user_id(request, user_id):
+    if user_id:
+        query_response = Comment.objects.filter(author=User.objects.get(user_id=user_id))
+        dicted_response = [i.to_dict() for i in query_response]
+        return HttpResponse(dicted_response, content_type='json')
+    else:
+        error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
+        return HttpResponseBadRequest(json.dumps(error_str))
+
+
 def comment_by_stop(request, stop_input):
     stop_input = None
     if request.method == 'GET' and 'stop_input' in request.GET:
