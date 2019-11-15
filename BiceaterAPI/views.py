@@ -41,12 +41,9 @@ def all_comments(request):
     return HttpResponse(dicted_response, content_type='json')
 
 
-def comments_by_user_id(request):
-    user_input = None
-    if request.method == 'GET' and 'input' in request.GET:
-        user_input = request.GET.get("input", '')
-    if user_input:
-        query_response = Comment.objects.filter(author=User.objects.get(user_id=user_input))
+def comments_by_user_id(request, user_id):
+    if user_id:
+        query_response = Comment.objects.filter(author=User.objects.get(user_id=user_id))
         dicted_response = [i.to_dict() for i in query_response]
         return HttpResponse(dicted_response, content_type='json')
     else:
