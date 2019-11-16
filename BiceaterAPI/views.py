@@ -51,7 +51,7 @@ def comments_by_user_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-def comment_by_stop(request, stop_input):
+def comment_by_stop(request):
     stop_input = None
     if request.method == 'GET' and 'stop_input' in request.GET:
         stop_input = request.GET.get("stop_input", '')
