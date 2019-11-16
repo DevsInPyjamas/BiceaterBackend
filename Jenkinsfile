@@ -20,7 +20,7 @@ pipeline {
       }
 
       stages {
-        step('build') {
+        stage('build') {
           steps {
             script {
               sh "docker image build -t alkesst/biceater-api:${GIT_COMMIT} --pull ."
@@ -29,7 +29,7 @@ pipeline {
           }
         }
 
-        step('push') {
+        stage('push') {
           steps {
             script {
               docker.withRegistry('', 'alkesst_dockerhub') {
@@ -40,7 +40,7 @@ pipeline {
           }
         }
 
-        // step('refresh env') {
+        // stage('refresh env') {
         //   step {
         //     sh 'curl https://portainer.majorcadevs.com/...'
         //   }
