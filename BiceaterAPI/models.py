@@ -39,7 +39,7 @@ class User(models.Model):
         }
 
     def __str__(self):
-        return self.username
+        return self.username + ": " + str(self.user_id)
 
 
 class Comment(models.Model):
@@ -60,18 +60,29 @@ class Comment(models.Model):
                                                     default='0')
 
     def to_dict(self):
-        return {
-            'comment_id': self.comment_id,
-            'text': self.text,
-            'date': str(self.date),
-            'author': self.author.to_dict(),
-            'answers_to': self.answers_to.to_dict(),
-            'bike_hire_docking_station_id':
-                self.bike_hire_docking_station_id
-        }
+        if not self.answers_to:
+            return {
+                'comment_id': self.comment_id,
+                'text': self.text,
+                'date': str(self.date),
+                'author': self.author.to_dict(),
+                'answers_to': None,
+                'bike_hire_docking_station_id':
+                    self.bike_hire_docking_station_id
+            }
+        else:
+            return {
+                'comment_id': self.comment_id,
+                'text': self.text,
+                'date': str(self.date),
+                'author': self.author.to_dict(),
+                'answers_to': self.answers_to.to_dict(),
+                'bike_hire_docking_station_id':
+                    self.bike_hire_docking_station_id
+            }
 
     def __str__(self):
-        return self.author.username+": "+self.comment_id
+        return self.author.username + ": " + str(self.comment_id)
 
 
 class Rating(models.Model):
@@ -95,4 +106,4 @@ class Rating(models.Model):
         }
 
     def __str__(self):
-        return self.author.username+": "+self.rating_id
+        return self.author.username + ": " + str(self.rating_id)
