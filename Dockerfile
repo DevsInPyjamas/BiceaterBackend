@@ -17,4 +17,6 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev jpeg-de
     apk --purge del .build-deps && \
     apk add --no-cache postgresql-libs jpeg zlib freetype lcms2 openjpeg tiff tk tcl binutils libc-dev
 
+EXPOSE 4000
+
 CMD gunicorn BiceaterBackend.wsgi -c gunicorn.conf
