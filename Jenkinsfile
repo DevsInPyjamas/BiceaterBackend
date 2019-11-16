@@ -11,9 +11,9 @@ pipeline {
 
   stages {
     stage('docker image') {
-      /*when {
+      when {
         branch 'master'
-      }*/
+      }
 
       agent {
         label 'docker-qemu'
