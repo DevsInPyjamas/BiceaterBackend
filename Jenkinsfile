@@ -41,7 +41,7 @@ pipeline {
         }
 
         stage('refresh env') {
-          step {
+          steps {
             sh 'curl https://portainer.majorcadevs.com/api/webhooks/891857aa-cc40-44f2-8173-80f580111a40'
           }
         }
