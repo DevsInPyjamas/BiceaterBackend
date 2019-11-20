@@ -4,11 +4,11 @@ from django.shortcuts import render
 # Create your views here.
 import json
 from .models import *
-from .decorators import returns_json
+from .decorators import returns_json, with_session
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 
 
-@login_required
+@with_session
 @returns_json
 def all_users(request):
     if not request.user.is_authenticated:
@@ -18,7 +18,7 @@ def all_users(request):
     return dicted_response
 
 
-@login_required
+@with_session
 @returns_json
 def users_by_username(request, user_input):
     if not request.user.is_authenticated:
@@ -35,7 +35,7 @@ def users_by_username(request, user_input):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@login_required
+@with_session
 @returns_json
 def users_by_id(request, user_id):
     if not request.user.is_authenticated:
@@ -49,7 +49,7 @@ def users_by_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@login_required
+@with_session
 @returns_json
 def all_comments(request):
     if not request.user.is_authenticated:
@@ -59,7 +59,7 @@ def all_comments(request):
     return dicted_response
 
 
-@login_required
+@with_session
 @returns_json
 def comments_by_user_id(request, user_id):
     if not request.user.is_authenticated:
@@ -73,7 +73,7 @@ def comments_by_user_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@login_required
+@with_session
 @returns_json
 def comment_by_stop(request, stop_input):
     if not request.user.is_authenticated:
@@ -90,7 +90,7 @@ def comment_by_stop(request, stop_input):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@login_required
+@with_session
 @returns_json
 def comment_of_comment(request, comment_id):
     if not request.user.is_authenticated:
