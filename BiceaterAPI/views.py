@@ -8,18 +8,17 @@ from .decorators import returns_json, with_session
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 
 
-@with_session
 @returns_json
+@with_session
 def all_users(request):
-    if not request.user.is_authenticated:
-        return HttpResponse('Unauthorized', status=401)
+
     query_response = User.objects.all()
     dicted_response = [i.to_dict() for i in query_response]
     return dicted_response
 
 
-@with_session
 @returns_json
+@with_session
 def users_by_username(request, user_input):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
@@ -35,8 +34,8 @@ def users_by_username(request, user_input):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@with_session
 @returns_json
+@with_session
 def users_by_id(request, user_id):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
@@ -49,8 +48,8 @@ def users_by_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@with_session
 @returns_json
+@with_session
 def all_comments(request):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
@@ -73,8 +72,8 @@ def comments_by_user_id(request, user_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@with_session
 @returns_json
+@with_session
 def comment_by_stop(request, stop_input):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
@@ -90,8 +89,8 @@ def comment_by_stop(request, stop_input):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@with_session
 @returns_json
+@with_session
 def comment_of_comment(request, comment_id):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
