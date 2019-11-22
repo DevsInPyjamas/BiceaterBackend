@@ -1,21 +1,17 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 # Create your models here.
 
 
-class User(models.Model):
+class AppUser(User):
     MALE = 'M'
     FEMALE = 'F'
     GENRE_CHOICES = [
         (MALE, 'Male'),
         (FEMALE, 'Female')
     ]
-
-    user_id = models.AutoField(primary_key=True)
-    username = models.CharField(unique=True, max_length=50, default='')
-    name = models.CharField(max_length=50, default='')
-    surname = models.CharField(max_length=50, blank=True)
     DoB = models.DateField(null=True)
     image = models.ImageField(blank=True, upload_to='profile_images', default='../media/')
     description = models.TextField(blank=True)
@@ -28,10 +24,10 @@ class User(models.Model):
 
     def to_dict(self):
         return {
-            'user_id': self.user_id,
+            'user_id': self.id,
             'username': self.username,
-            'name': self.name,
-            'surname': self.surname,
+            'name': self.first_name,
+            'surname': self.last_name,
             'DoB': str(self.DoB),
             'image': self.image.path,
             'description': self.description,
@@ -39,7 +35,7 @@ class User(models.Model):
         }
 
     def __str__(self):
-        return self.username + ": " + str(self.user_id)
+        return self.username + ": " + str(self.id)
 
 
 class Comment(models.Model):
@@ -47,7 +43,7 @@ class Comment(models.Model):
     text = models.TextField(max_length=140, default='')
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
-        User,
+        AppUser,
         on_delete=models.CASCADE
     )
     answers_to = models.ForeignKey(
@@ -89,7 +85,7 @@ class Rating(models.Model):
     rating_id = models.BigAutoField(primary_key=True)
     rating = models.IntegerField(null=False, default=3)
     date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User,
+    author = models.ForeignKey(AppUser,
                                on_delete=models.CASCADE,
                                null=False)
     bike_hire_docking_station_id = models.CharField(max_length=100,
