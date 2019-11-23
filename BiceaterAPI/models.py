@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class AppUser(User):
+class AppUser(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                primary_key=True)
     MALE = 'M'
     FEMALE = 'F'
     GENRE_CHOICES = [
@@ -24,10 +27,10 @@ class AppUser(User):
 
     def to_dict(self):
         return {
-            'user_id': self.id,
-            'username': self.username,
-            'name': self.first_name,
-            'surname': self.last_name,
+            'user_id': self.user.id,
+            'username': self.user.username,
+            'name': self.user.first_name,
+            'surname': self.user.last_name,
             'DoB': str(self.DoB),
             'image': self.image.path,
             'description': self.description,
@@ -35,7 +38,7 @@ class AppUser(User):
         }
 
     def __str__(self):
-        return self.username + ": " + str(self.id)
+        return self.user.username + ": " + str(self.id)
 
 
 class Comment(models.Model):
@@ -78,7 +81,7 @@ class Comment(models.Model):
             }
 
     def __str__(self):
-        return self.author.username + ": " + str(self.comment_id)
+        return self.author.user.username + ": " + str(self.comment_id)
 
 
 class Rating(models.Model):
@@ -102,4 +105,4 @@ class Rating(models.Model):
         }
 
     def __str__(self):
-        return self.author.username + ": " + str(self.rating_id)
+        return self.author.user.username + ": " + str(self.rating_id)

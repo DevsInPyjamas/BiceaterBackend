@@ -13,7 +13,7 @@ from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpRespo
 def all_users(request):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
-    query_response = User.objects.all()
+    query_response = AppUser.objects.all()
     dicted_response = [i.to_dict() for i in query_response]
     return dicted_response
 
@@ -27,7 +27,7 @@ def users_by_username(request, user_input):
     if request.method == 'GET' and 'user_input' in request.GET:
         user_input = request.GET.get("user_input", '')
     if user_input:
-        query_response = User.objects.filter(username__contains=user_input)
+        query_response = AppUser.objects.filter(username__contains=user_input)
         dicted_response = [i.to_dict() for i in query_response]
         return dicted_response
     else:
@@ -41,7 +41,7 @@ def users_by_id(request, user_id):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
     if user_id:
-        query_response = User.objects.get(user_id=user_id)
+        query_response = AppUser.objects.get(user_id=user_id)
         dicted_response = [query_response.to_dict()]
         return dicted_response
     else:
