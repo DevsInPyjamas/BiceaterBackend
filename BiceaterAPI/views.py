@@ -104,6 +104,7 @@ def comment_of_comment(request, comment_id):
         error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
         return HttpResponseBadRequest(json.dumps(error_str))
 
+
 @returns_json
 @login_required
 def comments_list(request, author):
