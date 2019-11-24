@@ -1,5 +1,5 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
-
 # Create your views here.
 import json
 from .models import *
@@ -72,3 +72,29 @@ def comment_of_comment(request, comment_id):
     else:
         error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
         return HttpResponseBadRequest(json.dumps(error_str))
+
+@returns_json
+@with_session
+def comments_list(request, author):
+    query_response = Comment.objects.filter(author=author)
+    queryfilter = int(request.GET.get('query_response', 10))
+    paginator = Paginator(query_response, queryfilter)
+    page = request.GET.get('page')
+    comments = paginator.get_page(page)
+    return HttpResponse(paginator, content_type='json')
+
+
+def datos_Abiertos(request):
+    response = request.get(
+        'https://datosabiertos.malaga.eu/recursos/transporte/EMT/EMTocupestacbici/ocupestacbicifiware.json')
+    malaga = response.json()
+    return HttpResponse(request, malaga, {
+        'status': malaga['status'],
+        'totalSlotNumber': malaga['totalSlotNumber'],
+        'availableBikeNumber': malaga['availableBikeNumber'],
+        'freeSlotNumber': malaga['freeSlotNumber'],
+        'location': malaga['location'],
+        'address': malaga['address'],
+        'type': malaga['type'],
+        'id': malaga['id'],
+    })

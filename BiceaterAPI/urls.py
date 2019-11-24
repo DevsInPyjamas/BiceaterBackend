@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^users/(?P<user_input>\w{0,50})/$', views.users_by_username, name='Users by username'),
     url(r'^comments$', views.all_comments, name='All comments'),
     url(r'^comments/(?P<user_id>[0-9]+)$', views.comments_by_user_id, name='Comments by user id'),
+    path('', views.malaga_Api, name='malaga_Api'),
 ]
