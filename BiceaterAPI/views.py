@@ -105,7 +105,7 @@ def comment_of_comment(request, comment_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 @returns_json
-@with_session
+@login_required
 def comments_list(request, author):
     query_response = Comment.objects.filter(author=author)
     queryfilter = int(request.GET.get('query_response', 10))
