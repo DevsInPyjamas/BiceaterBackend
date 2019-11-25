@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^comments$', views.all_comments, name='All comments'),
     url(r'^comments(?P<stop_input>)/$', views.comment_by_stop, name='Stops comments'),
     url(r'^comments/(?P<comment_id>[0-9]+)/$', views.comment_of_comment, name='Comments of comments'),
-    url(r'^comments(?P<author>\w{0,50})/$', views.comments_list, name='List of Comments'),
+    url(r'^users/(?P<author>\w{0,50})/comments/?taking=10&page=0$', views.comments_list, name='List of Comments'),
     path('datosabiertos/', views.datos_Abiertos, name='datos-Abiertos'),
+
 ]

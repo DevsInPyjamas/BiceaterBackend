@@ -111,7 +111,7 @@ def comments_list(request, author):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
     query_response = Comment.objects.filter(author=author)
-    queryfilter = int(request.GET.get('query_response', 10))
+    queryfilter = int(request.GET.get('taking'))
     paginator = Paginator(query_response, queryfilter)
     page = request.GET.get('page')
     return HttpResponse(paginator, content_type='json')
