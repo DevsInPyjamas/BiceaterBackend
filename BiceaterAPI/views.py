@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 
 # Create your views here.
 import json
@@ -7,6 +6,7 @@ from .models import *
 from .decorators import returns_json
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 from .utils import datos_abiertos
+import re
 
 
 @login_required
@@ -115,6 +115,7 @@ def fetch_stations(request):
     for element in stations_json:
         location = element['location']['value']
         address = element['address']['value']
+        address['streetAddress'] = re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])
         station_id = element['id'].split(':')[3]
         stations.append({station_id: [location, address]})
     return stations
@@ -127,4 +128,6 @@ def fetch_station(request, station_id):
         return HttpResponse('Unauthorized', status=401)
     stations_json = datos_abiertos()
     output_dict = [element for element in stations_json if element['id'].split(':')[3] == station_id]
+    output_dict[0]['address']['value']['streetAddress'] = \
+        re.sub(r'[_]+', ' ', output_dict[0]['address']['value']['streetAddress'])
     return output_dict[0]
