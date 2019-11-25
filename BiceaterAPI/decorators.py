@@ -14,19 +14,3 @@ def returns_json(func):
         return response
 
     return returns_json_decorator
-
-
-def with_session(func):
-    def with_session_decorator(request):
-        if 'HTTP_X_SESSION_USER' in request.META:
-            header_request = request.META['HTTP_X_SESSION_USER']
-            logged_user = models.User.objects.filter(name=header_request)
-            if len(logged_user) < 1:
-                response = {'error': 'No existent user provided as session user'}
-            else:
-                response = func(request, logged_user[0])
-        else:
-            response = {'error': 'No user provided as session user'}
-        return response
-
-    return with_session_decorator
