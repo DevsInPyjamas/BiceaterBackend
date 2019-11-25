@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^comments$', views.all_comments, name='All comments'),
     url(r'^comments(?P<stop_input>)/$', views.comment_by_stop, name='Stops comments'),
     url(r'^comments/(?P<comment_id>[0-9]+)/$', views.comment_of_comment, name='Comments of comments'),
+    url(r'^stations/(?P<station_id>[0-9]+)/$', views.fetch_station, name='Fetch Station'),
+    url(r'^stations/$', views.fetch_stations, name='Fetch All Stations')
 ]

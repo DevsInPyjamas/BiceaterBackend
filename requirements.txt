@@ -1,4 +1,3 @@
-dotenv
 Django==2.2.7
 psycopg2==2.8.4
 pytz==2019.3
