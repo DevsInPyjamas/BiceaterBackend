@@ -1,5 +1,6 @@
 import json
 from django.http import HttpResponse
+from BiceaterAPI import models
 
 
 def returns_json(func):
