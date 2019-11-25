@@ -65,7 +65,21 @@ def comments_by_user_id(request, user_id):
     if not request.user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
     if user_id:
-        query_response = Comment.objects.filter(author=User.objects.get(user_id=user_id))
+        query_response = Comment.objects.filter(author=AppUser.objects.get(user_id=user_id))
+        dicted_response = [i.to_dict() for i in query_response]
+        return dicted_response
+    else:
+        error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
+        return HttpResponseBadRequest(json.dumps(error_str))
+
+
+@login_required
+@returns_json
+def one_comment_by_user_id(request, user_id, comment_id):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+    if user_id and comment_id:
+        query_response = Comment.objects.filter(author=AppUser.objects.get(user_id=user_id), comment_id=comment_id)
         dicted_response = [i.to_dict() for i in query_response]
         return dicted_response
     else:
