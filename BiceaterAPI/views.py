@@ -128,6 +128,8 @@ def fetch_station(request, station_id):
         return HttpResponse('Unauthorized', status=401)
     stations_json = datos_abiertos()
     output_dict = [element for element in stations_json if element['id'].split(':')[3] == station_id]
-    output_dict[0]['address']['value']['streetAddress'] = \
-        re.sub(r'[_]+', ' ', output_dict[0]['address']['value']['streetAddress'])
-    return output_dict[0]
+    output_dict = output_dict[0]
+    output_dict['address']['value']['streetAddress'] = \
+        re.sub(r'[_]+', ' ', output_dict['address']['value']['streetAddress'])
+    output_dict['id'] = output_dict['id'].split(':')[3]
+    return output_dict
