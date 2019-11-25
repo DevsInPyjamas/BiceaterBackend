@@ -105,18 +105,23 @@ def comment_of_comment(request, comment_id):
         return HttpResponseBadRequest(json.dumps(error_str))
 
 
-@returns_json
 @login_required
+@returns_json
 def comments_list(request, author):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
     query_response = Comment.objects.filter(author=author)
     queryfilter = int(request.GET.get('query_response', 10))
     paginator = Paginator(query_response, queryfilter)
     page = request.GET.get('page')
-    comments = paginator.get_page(page)
     return HttpResponse(paginator, content_type='json')
 
 
+@login_required
+@returns_json
 def datos_Abiertos(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
     response = request.get(
         'https://datosabiertos.malaga.eu/recursos/transporte/EMT/EMTocupestacbici/ocupestacbicifiware.json')
     malaga = response.json()
