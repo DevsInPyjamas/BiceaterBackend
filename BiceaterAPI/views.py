@@ -1,12 +1,11 @@
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-import json
 from .models import *
 from .decorators import returns_json
-from django.http import HttpResponseBadRequest, HttpResponse
-from .utils import datos_abiertos, check_authorized, throw_bad_request
+from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden
 import re
+
 
 # READ OPERATIONS
 
@@ -27,7 +26,8 @@ def users_by_username(request, user_input):
     if request.method == 'GET' and 'user_input' in request.GET:
         user_input = request.GET.get("user_input", '')
     if user_input:
-        query_response = AppUser.objects.filter(username__contains=user_input)
+        user = User.objects.filter(username__contains=user_input)
+        query_response = AppUser.objects.filter(user=user)
         dicted_response = [i.to_dict() for i in query_response]
         return dicted_response
     else:
@@ -61,7 +61,8 @@ def all_comments(request):
 def comments_by_user_id(request, user_id):
     check_authorized(request.user)
     if user_id:
-        query_response = Comment.objects.filter(author=User.objects.get(user_id=user_id))
+        user = User.objects.get(user_id=user_id)
+        query_response = Comment.objects.filter(author=AppUser.objects.get(user=user))
         dicted_response = [i.to_dict() for i in query_response]
         return dicted_response
     else:
@@ -110,6 +111,65 @@ def create_comment(request):
         comment.save()
     else:
         throw_bad_request()
+
+
+@login_required
+def update_user(request):
+    check_authorized(request.user)
+    username = None
+    first_name = None
+    last_name = None
+    genre = None
+    dob = None
+    image = None
+    description = None
+    hobbies = None
+    if (request.method == 'POST' and 'username' in request.POST and 'first_name' in request.POST
+            and 'last_name' in request.POST and 'genre' in request.POST and 'dob' in request.POST
+            and 'image' in request.POST and 'description' in request.POST and 'hobbies' in request.POST):
+        username = request.POST['username']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        genre = request.POST['genre']
+        dob = request.POST['dob']
+        image = request.POST['image']
+        description = request.POST['description']
+        hobbies = request.POST['hobbies']
+    if username and first_name and last_name and genre and dob and image and description and hobbies:
+        request.user.username = username
+        request.user.first_name = first_name
+        request.user.last_name = last_name
+        user = AppUser.objects.get(user=request.user)
+        user.genre = genre
+        user.DoB = dob
+        user.image = image
+        user.description = description
+        user.hobbies = hobbies
+    else:
+        throw_bad_request()
+
+
+@login_required
+def delete_comment(request):
+    check_authorized(request.user)
+    comment_id = None
+    if request.method == 'POST' and 'comment_id' in request.POST:
+        comment_id = request.POST['comment_id']
+    if comment_id:
+        comment = Comment.objects.get(comment_id=comment_id)
+        user = AppUser.objects.get(user=request.user)
+        if comment.author == user:
+            comment.delete()
+        else:
+            throw_forbidden()
+    else:
+        throw_bad_request()
+
+
+@login_required
+def delete_user(request):
+    check_authorized(request.user)
+    request.user.delete()
 
 
 # FETCH API DATOS ABIERTOS

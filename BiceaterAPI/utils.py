@@ -1,7 +1,7 @@
 import requests
 import json
 
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 
 
 def datos_abiertos():
@@ -19,3 +19,7 @@ def check_authorized(user):
 def throw_bad_request():
     error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
     return HttpResponseBadRequest(json.dumps(error_str))
+
+
+def throw_forbidden():
+    return HttpResponseForbidden()
