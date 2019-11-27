@@ -1,9 +1,12 @@
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+from django.template import RequestContext
+
 from .models import *
+import json
 from .decorators import returns_json
-from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden
+from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden, calculate_manhattan_dist
 import re
 
 
@@ -200,3 +203,18 @@ def fetch_station(request, station_id):
         re.sub(r'[_]+', ' ', output_dict['address']['value']['streetAddress'])
     output_dict['id'] = output_dict['id'].split(':')[3]
     return output_dict
+
+
+@login_required
+@returns_json
+def calculate_best_route(request):
+    location = json.loads(request.body)
+    stations_json = datos_abiertos()
+    distance_position = {}
+    for element in stations_json:
+        distance_position[element['id'].split(':')[3]] = \
+                                                        calculate_manhattan_dist(location['currentLocation'], \
+                                                                    element['location']['value']['coordinates'])
+    best_distance = next(iter(sorted(distance_position.values())))
+    return {best_distance: distance_position[best_distance]}
+
