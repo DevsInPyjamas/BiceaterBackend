@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
-
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.template import RequestContext
 
 from .models import *
 import json
 from .decorators import returns_json
-from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden, calculate_manhattan_dist
+from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden
+from haversine import haversine
 import re
 
 
@@ -206,20 +207,27 @@ def fetch_station(request, station_id):
 
 
 @login_required
+@csrf_exempt
 @returns_json
 def calculate_best_route(request):
-    location = json.loads(request.body)
+    location = json.loads(request.body)['currentLocation']
     stations_json = datos_abiertos()
     distance_position = {}
     for element in stations_json:
-        distance_position[element['id'].split(':')[3]] = \
-                                                        calculate_manhattan_dist(location['currentLocation'], \
-                                                                    element['location']['value']['coordinates'])
+        station_location = element['location']['value']['coordinates']
+        distance_position[element['id']] = haversine(
+                (float(location[0]), float(location[1])),
+                (float(station_location[0]), float(station_location[1]))
+            )
+
     best_distance = sorted(distance_position.values())[0]
     best_distance_key = None
     for identifier, distance in distance_position.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
         if distance == best_distance:
             best_distance_key = identifier
 
-    return {best_distance_key: best_distance}
+    return {
+        "location":
+        [element for element in stations_json if element['id'] == best_distance_key][0]['location']['value']['coordinates']
+    }
 

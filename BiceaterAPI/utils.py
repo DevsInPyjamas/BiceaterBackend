@@ -25,6 +25,5 @@ def throw_forbidden():
     return HttpResponseForbidden()
 
 
-def calculate_manhattan_dist(current_location, location_goal):
-    return abs(float(current_location[0]) - float(location_goal[0])) + \
-           abs(float(current_location[1]) - float(location_goal[1]))
+def find_station_by_id():
+    pass
