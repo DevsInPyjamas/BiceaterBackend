@@ -215,6 +215,11 @@ def calculate_best_route(request):
         distance_position[element['id'].split(':')[3]] = \
                                                         calculate_manhattan_dist(location['currentLocation'], \
                                                                     element['location']['value']['coordinates'])
-    best_distance = next(iter(sorted(distance_position.values())))
-    return {best_distance: distance_position[best_distance]}
+    best_distance = sorted(distance_position.values())[0]
+    best_distance_key = None
+    for identifier, distance in distance_position.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+        if distance == best_distance:
+            best_distance_key = identifier
+
+    return {best_distance_key: best_distance}
 
