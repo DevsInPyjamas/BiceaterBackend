@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 from django.core.paginator import Paginator
-from django.shortcuts import render
 
 from .models import *
 from .decorators import returns_json
@@ -64,22 +63,13 @@ def all_comments(request):
 def comments_by_user_id(request, user_id):
     check_authorized(request.user)
     if user_id:
-        query_response = Comment.objects.filter(author=AppUser.objects.get(User.objects.get(user_id=user_id)))
-        queryfilter = int(request.GET.get('taking'))
-        paginator = Paginator(query_response, queryfilter)
+        comments = Comment.objects.filter(author=AppUser.objects.get(User.objects.get(user_id=user_id)))
+        taking_by_page = int(request.GET.get('taking'))
+        paginator = Paginator(comments, taking_by_page)
         page = request.GET.get('page')
-        next_page = None
-        prev_page = None
 
-        if page + 1 < paginator.count:
-            next_page = f'^users/{user_id}/comments/taking={queryfilter}&page={page + 1}'
-
-        if page - 1 > 0:
-            prev_page = f'^users/{user_id}/comments/taking={queryfilter}&page={page - 1}'
-
-        comments = paginator.get_page(page)
-        context = {'comments': comments, 'next_page': next_page, 'prev_page': prev_page}
-        return render(request, context)
+        comments_page = paginator.get_page(page)
+        return {"comments": comments_page, "count": paginator.count}
     else:
         throw_bad_request()
 
