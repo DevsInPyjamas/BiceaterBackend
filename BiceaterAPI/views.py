@@ -72,6 +72,16 @@ def comments_by_user_id(request, user_id):
     else:
         throw_bad_request()
 
+@login_required
+@returns_json
+def one_comment_by_user_id(request, user_id, comment_id):
+    check_authorized(request.user)
+    if user_id and comment_id:
+        query_response = Comment.objects.filter(author=AppUser.objects.get(user_id=user_id), comment_id=comment_id)
+        dicted_response = [i.to_dict() for i in query_response]
+        return dicted_response
+    else:
+        throw_bad_request()
 
 @login_required
 @returns_json
