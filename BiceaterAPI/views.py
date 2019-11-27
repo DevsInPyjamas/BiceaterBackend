@@ -6,6 +6,7 @@ import json
 from .models import *
 from .decorators import returns_json
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
+from .utils import datos_abiertos
 
 
 @login_required
@@ -116,3 +117,28 @@ def comment_of_comment(request, comment_id):
     else:
         error_str = {'error': 'BAD REQUEST:  It is required to receive an argument'}
         return HttpResponseBadRequest(json.dumps(error_str))
+
+
+@login_required
+@returns_json
+def fetch_stations(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+    stations_json = datos_abiertos()
+    stations = []
+    for element in stations_json:
+        location = element['location']['value']
+        address = element['address']['value']
+        station_id = element['id'].split(':')[3]
+        stations.append({station_id: [location, address]})
+    return stations
+
+
+@login_required
+@returns_json
+def fetch_station(request, station_id):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+    stations_json = datos_abiertos()
+    output_dict = [element for element in stations_json if element['id'].split(':')[3] == station_id]
+    return output_dict[0]
