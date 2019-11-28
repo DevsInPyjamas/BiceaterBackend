@@ -63,7 +63,7 @@ def all_comments(request):
 def comments_by_user_id(request, user_id):
     check_authorized(request.user)
     if user_id:
-        comments = Comment.objects.filter(author=user_id)
+        comments = Comment.objects.filter(author=user_id).order_by('-date')
         taking_by_page = int(request.GET.get('taking'))
         paginator = Paginator(comments, taking_by_page)
         page = int(request.GET.get('page'))
