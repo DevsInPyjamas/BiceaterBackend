@@ -41,7 +41,7 @@ def users_by_username(request, user_input):
 def users_by_id(request, user_id):
     check_authorized(request.user)
     if user_id:
-        user = User.objects.get(user_id=user_id)
+        user = AppUser.objects.get(user_id=user_id)
         query_response = AppUser.objects.get(user=user)
         dicted_response = [query_response.to_dict()]
         return dicted_response
@@ -63,15 +63,17 @@ def all_comments(request):
 def comments_by_user_id(request, user_id):
     check_authorized(request.user)
     if user_id:
-        comments = Comment.objects.filter(author=AppUser.objects.get(User.objects.get(user_id=user_id)))
+        comments = Comment.objects.filter(author=user_id)
         taking_by_page = int(request.GET.get('taking'))
         paginator = Paginator(comments, taking_by_page)
-        page = request.GET.get('page')
+        page = int(request.GET.get('page'))
 
         comments_page = paginator.get_page(page)
-        return {"comments": comments_page, "count": paginator.count}
+        comments_page_response = [i.to_dict() for i in comments_page.object_list]
+        return {"comments": comments_page_response, "count": paginator.count}
     else:
         throw_bad_request()
+
 
 @login_required
 @returns_json
@@ -83,6 +85,7 @@ def one_comment_by_user_id(request, user_id, comment_id):
         return dicted_response
     else:
         throw_bad_request()
+
 
 @login_required
 @returns_json
