@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from http import HTTPStatus
 # Create your views here.
+
 from django.template import RequestContext
 
 from .models import *
@@ -8,6 +10,7 @@ import json
 from .decorators import returns_json
 from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden
 from haversine import haversine
+from django.http import HttpResponse
 import re
 
 
@@ -111,25 +114,35 @@ def comment_of_comment(request, comment_id):
 
 # CREATE OPERATIONS
 @login_required
+@csrf_exempt
 def create_comment(request):
     check_authorized(request.user)
+    body = json.loads(request.body.decode('utf-8'))
     text = None
     bike_hire_docking_station_id = None
-    if(request.method == 'POST' and 'text' in request.POST
-            and 'bike_hire_docking_station_id' in request.POST):
-        text = request.POST['text']
-        bike_hire_docking_station_id = request.POST['bike_hire_docking_station_id']
+    if(request.method == 'POST' and 'comment' in body
+            and 'bikeDockingStationId' in body):
+        text = body['comment']
+        bike_hire_docking_station_id = body['bikeDockingStationId']
     if text and bike_hire_docking_station_id:
-        comment = Comment(text=text, author=AppUser.objects.get(user=request.user),
-                          bike_hire_docking_station_id=bike_hire_docking_station_id)
+        comment = Comment()
+        comment.text = text
+        comment.bike_hire_docking_station_id = bike_hire_docking_station_id
+        comment.answers_to = None
+        author = AppUser.objects.get(user=request.user.id)
+        comment.author = author
         comment.save()
+        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
     else:
         throw_bad_request()
 
 
 @login_required
+@csrf_exempt
 def update_user(request):
     check_authorized(request.user)
+    app_user = AppUser.objects.get_or_create(user=request.user.id)
+    body = json.loads(request.body.decode('utf-8'))
     username = None
     first_name = None
     last_name = None
@@ -138,27 +151,29 @@ def update_user(request):
     image = None
     description = None
     hobbies = None
-    if (request.method == 'POST' and 'username' in request.POST and 'first_name' in request.POST
-            and 'last_name' in request.POST and 'genre' in request.POST and 'dob' in request.POST
-            and 'image' in request.POST and 'description' in request.POST and 'hobbies' in request.POST):
-        username = request.POST['username']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        genre = request.POST['genre']
-        dob = request.POST['dob']
-        image = request.POST['image']
-        description = request.POST['description']
-        hobbies = request.POST['hobbies']
+    if (request.method == 'POST' and 'username' in body and 'first_name' in body
+            and 'last_name' in body and 'genre' in body and 'dob' in body
+            and 'image' in body and 'description' in body and 'hobbies' in body):
+        username = body['username']
+        first_name = body['first_name']
+        last_name = body['last_name']
+        genre = body['genre']
+        dob = body['dob']
+        image = body['image']
+        description = body['description']
+        hobbies = body['hobbies']
     if username and first_name and last_name and genre and dob and image and description and hobbies:
         request.user.username = username
         request.user.first_name = first_name
         request.user.last_name = last_name
-        user = AppUser.objects.get(user=request.user)
-        user.genre = genre
-        user.DoB = dob
-        user.image = image
-        user.description = description
-        user.hobbies = hobbies
+        app_user.genre = genre
+        app_user.DoB = dob
+        app_user.image = image
+        app_user.description = description
+        app_user.hobbies = hobbies
+        request.user.save()
+        app_user.save()
+        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
     else:
         throw_bad_request()
 
