@@ -12,5 +12,7 @@ urlpatterns = [
     url(r'^comments(?P<stop_input>)/$', views.comment_by_stop, name='Stops comments'),
     url(r'^comments/(?P<comment_id>[0-9]+)/$', views.comment_of_comment, name='Comments of comments'),
     url(r'^stations/(?P<station_id>[0-9]+)/$', views.fetch_station, name='Fetch Station'),
-    url(r'^stations/$', views.fetch_stations, name='Fetch All Stations')
+    url(r'^stations/$', views.fetch_stations, name='Fetch All Stations'),
+    url(r'^create/comment', views.create_comment, name="Create new comment"),
+    url(r'^routes/calculate', views.calculate_best_route, name='Routing calculation')
 ]
