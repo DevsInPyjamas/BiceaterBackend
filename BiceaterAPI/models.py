@@ -39,7 +39,7 @@ class AppUser(models.Model):
         }
 
     def __str__(self):
-        return self.user.username + ": " + str(self.id)
+        return self.user.username + ": " + str(self.user_id)
 
 
 class Comment(models.Model):
