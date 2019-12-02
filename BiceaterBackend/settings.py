@@ -63,7 +63,7 @@ SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 # LOGIN_URL = '/api/login/google-oauth2/'
 
-LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login'
 
 MIDDLEWARE = [
