@@ -249,8 +249,11 @@ def calculate_best_route(request):
         if distance == best_distance:
             best_distance_key = identifier
 
+    temp = [element for element in stations_json if element['id'] == best_distance_key][0]
+
     return {
         "location":
-        [element for element in stations_json if element['id'] == best_distance_key][0]['location']['value']['coordinates']
+        temp['location']['value']['coordinates'],
+        "direction": re.sub(r'[_]+', ' ', temp['address']['value']['streetAddress'])
     }
 
