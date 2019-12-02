@@ -59,6 +59,15 @@ def all_comments(request):
     return dicted_response
 
 
+@returns_json
+def logout(request):
+    user = getattr(request, 'user', None)
+    if not getattr(user, 'is_authenticated', True):
+        user = None
+    request.session.flush()
+    return {"message": "okey"}
+
+
 @check_authorized
 @returns_json
 def comments_by_user_id(request, user_id):
