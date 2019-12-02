@@ -1,7 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
-from django.template import RequestContext
 
 from django.core.paginator import Paginator
 
