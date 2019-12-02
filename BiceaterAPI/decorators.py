@@ -14,3 +14,14 @@ def returns_json(func):
         return response
 
     return returns_json_decorator
+
+
+def check_authorized(func):
+    def check_authorized_decorator(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse('Unauthorized', status=401)
+        response = func(request, *args, **kwargs)
+
+        return response
+
+    return check_authorized_decorator
