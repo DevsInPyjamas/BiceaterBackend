@@ -23,3 +23,7 @@ def throw_bad_request():
 
 def throw_forbidden():
     return HttpResponseForbidden()
+
+
+def find_station_by_id():
+    pass

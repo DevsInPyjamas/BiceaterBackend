@@ -61,7 +61,7 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-LOGIN_URL = '/auth/login/google-oauth2/'
+LOGIN_URL = '/api/login/google-oauth2/'
 
 LOGIN_REDIRECT_URL = 'http://localhost:3000/'
 LOGOUT_REDIRECT_URL = '/login'
