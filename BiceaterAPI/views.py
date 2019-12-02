@@ -43,7 +43,7 @@ def users_by_username(request, user_input):
 @returns_json
 def users_by_id(request, user_id):
     if user_id:
-        user = User.objects.get(user_id=user_id)
+        user = AppUser.objects.get(user_id=user_id)
         query_response = AppUser.objects.get(user=user)
         dicted_response = [query_response.to_dict()]
         return dicted_response
