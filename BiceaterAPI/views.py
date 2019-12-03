@@ -8,7 +8,7 @@ from django.template import RequestContext
 from .models import *
 import json
 from .decorators import returns_json, check_authorized
-from .utils import datos_abiertos, throw_bad_request, throw_forbidden
+from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station
 from haversine import haversine
 from django.http import HttpResponse
 import re
@@ -251,9 +251,5 @@ def calculate_best_route(request):
 
     temp = [element for element in stations_json if element['id'] == best_distance_key][0]
 
-    return {
-        "location":
-        temp['location']['value']['coordinates'],
-        "direction": re.sub(r'[_]+', ' ', temp['address']['value']['streetAddress'])
-    }
+    return general_info_from_station(temp)
 
