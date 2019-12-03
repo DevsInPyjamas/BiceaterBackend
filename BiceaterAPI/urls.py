@@ -14,5 +14,7 @@ urlpatterns = [
     url(r'^comments/(?P<comment_id>[0-9]+)/$', views.comment_of_comment, name='Comments of comments'),
     url(r'^stations/(?P<station_id>[0-9]+)/$', views.fetch_station, name='Fetch Station'),
     url(r'^stations/$', views.fetch_stations, name='Fetch All Stations'),
+    url(r'^stations/(?P<station_id>[0-9]+)/comments/taking=(?P<taking>[0-9]+)&page=(?P<page>[0-9]+)$', views.comments_list, name='Comments by station'),
     url(r'^routes/calculate', views.calculate_best_route, name='Routing calculation')
+
 ]
