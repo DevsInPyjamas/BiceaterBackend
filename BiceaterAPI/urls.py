@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^stations/(?P<station_id>[0-9]+)/$', views.fetch_station, name='Fetch Station'),
     url(r'^stations/$', views.fetch_stations, name='Fetch All Stations'),
     url(r'^create/comment', views.create_comment, name="Create new comment"),
-    url(r'^routes/calculate', views.calculate_best_route, name='Routing calculation')
+    url(r'^routes/calculate', views.calculate_best_route, name='Routing calculation'),
+    url(r'^logout/', views.logout, name='logout'),
 ]
