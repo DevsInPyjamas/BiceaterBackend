@@ -85,6 +85,20 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
+def comments_by_station_id(request, station_id):
+    if station_id:
+        comments = Comment.objects.filter(bike_hire_docking_station_id=station_id).order_by('-date')
+        taking_by_page = int(request.GET.get('taking'))
+        paginator = Paginator(comments, taking_by_page)
+        page = int(request.GET.get('page'))
+
+        comments_page = paginator.get_page(page)
+        comments_page_response = [i.to_dict() for i in comments_page.object_list]
+        return {"comments": comments_page_response, "count": paginator.count}
+    else:
+        throw_bad_request()
+
+
 @check_authorized
 @returns_json
 def one_comment_by_user_id(request, user_id, comment_id):
