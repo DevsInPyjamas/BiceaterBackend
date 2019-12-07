@@ -134,6 +134,7 @@ def comment_of_comment(request, comment_id):
     else:
         throw_bad_request()
 
+
 # CREATE OPERATIONS
 @csrf_exempt
 @check_authorized
@@ -141,15 +142,22 @@ def create_comment(request):
     body = json.loads(request.body.decode('utf-8'))
     text = None
     bike_hire_docking_station_id = None
-    if(request.method == 'POST' and 'comment' in body
-            and 'bikeDockingStationId' in body):
+    comment_id = None
+    if request.method == 'POST' and 'comment' in body:
         text = body['comment']
-        bike_hire_docking_station_id = body['bikeDockingStationId']
-    if text and bike_hire_docking_station_id:
+        if bike_hire_docking_station_id in body and comment_id in body:
+            throw_bad_request()
+        elif bike_hire_docking_station_id in body:
+            bike_hire_docking_station_id = body['bikeDockingStationId']
+        elif comment_id in body:
+            comment_id = body['commentId']
+        else:
+            throw_bad_request()
+    if text and (bike_hire_docking_station_id or comment_id):
         comment = Comment()
         comment.text = text
         comment.bike_hire_docking_station_id = bike_hire_docking_station_id
-        comment.answers_to = None
+        comment.answers_to = comment_id
         author = AppUser.objects.get(user=request.user.id)
         comment.author = author
         comment.save()
