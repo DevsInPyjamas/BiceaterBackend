@@ -20,4 +20,4 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev jpeg-de
 
 EXPOSE 4000
 
-CMD gunicorn BiceaterBackend.wsgi -c gunicorn.conf
+CMD gunicorn BiceaterBackend.wsgi -c gunicornConfig.py

@@ -1,49 +1,45 @@
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from http import HTTPStatus
+# Create your views here.
 
 from django.core.paginator import Paginator
 
 from .models import *
 import json
-from .decorators import returns_json
-from .utils import datos_abiertos, check_authorized, throw_bad_request, throw_forbidden
+from .decorators import returns_json, check_authorized
+from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station, to_dict_auth_user
 from haversine import haversine
+from django.http import HttpResponse
 import re
 
 
 # READ OPERATIONS
 
-@login_required
+@check_authorized
 @returns_json
 def all_users(request):
-    check_authorized(request.user)
-    query_response = AppUser.objects.all()
-    dicted_response = [i.to_dict() for i in query_response]
-    return dicted_response
-
-
-@login_required
-@returns_json
-def users_by_username(request, user_input):
-    check_authorized(request.user)
-    user_input = None
     if request.method == 'GET' and 'user_input' in request.GET:
         user_input = request.GET.get("user_input", '')
-    if user_input:
-        user = User.objects.filter(username__contains=user_input)
-        query_response = AppUser.objects.filter(user=user)
-        dicted_response = [i.to_dict() for i in query_response]
-        return dicted_response
+        user_set = User.objects.filter(username__contains=user_input)
+        emails_set = User.objects.filter(email__contains=user_input)
+        response = {}
+        for user in user_set:
+            to_dict_auth_user(response, user)
+        for user_email in emails_set:
+            to_dict_auth_user(response, user_email)
+        return response
     else:
-        throw_bad_request()
+        query_response = User.objects.all()
+        dict_response = {}
+        [to_dict_auth_user(dict_response, i) for i in query_response]
+        return dict_response
 
 
-@login_required
+@check_authorized
 @returns_json
 def users_by_id(request, user_id):
-    check_authorized(request.user)
     if user_id:
-        user = User.objects.get(user_id=user_id)
+        user = AppUser.objects.get(user_id=user_id)
         query_response = AppUser.objects.get(user=user)
         dicted_response = [query_response.to_dict()]
         return dicted_response
@@ -51,35 +47,58 @@ def users_by_id(request, user_id):
         throw_bad_request()
 
 
-@login_required
+@check_authorized
 @returns_json
 def all_comments(request):
-    check_authorized(request.user)
     query_response = Comment.objects.all()
     dicted_response = [i.to_dict() for i in query_response]
     return dicted_response
 
 
-@login_required
+@returns_json
+def logout(request):
+    user = getattr(request, 'user', None)
+    if not getattr(user, 'is_authenticated', True):
+        user = None
+    request.session.flush()
+    return {"message": "okey"}
+
+
+@check_authorized
 @returns_json
 def comments_by_user_id(request, user_id):
-    check_authorized(request.user)
     if user_id:
-        comments = Comment.objects.filter(author=AppUser.objects.get(User.objects.get(user_id=user_id)))
+        comments = Comment.objects.filter(author=user_id).order_by('-date')
         taking_by_page = int(request.GET.get('taking'))
         paginator = Paginator(comments, taking_by_page)
-        page = request.GET.get('page')
+        page = int(request.GET.get('page'))
 
         comments_page = paginator.get_page(page)
-        return {"comments": comments_page, "count": paginator.count}
+        comments_page_response = [i.to_dict() for i in comments_page.object_list]
+        return {"comments": comments_page_response, "count": paginator.count}
     else:
         throw_bad_request()
 
 
-@login_required
+@check_authorized
+@returns_json
+def comments_by_station_id(request, station_id):
+    if station_id:
+        comments = Comment.objects.filter(bike_hire_docking_station_id=station_id).order_by('-date')
+        taking_by_page = int(request.GET.get('taking'))
+        paginator = Paginator(comments, taking_by_page)
+        page = int(request.GET.get('page'))
+
+        comments_page = paginator.get_page(page)
+        comments_page_response = [i.to_dict() for i in comments_page.object_list]
+        return {"comments": comments_page_response, "count": paginator.count}
+    else:
+        throw_bad_request()
+
+
+@check_authorized
 @returns_json
 def one_comment_by_user_id(request, user_id, comment_id):
-    check_authorized(request.user)
     if user_id and comment_id:
         query_response = Comment.objects.filter(author=AppUser.objects.get(user_id=user_id), comment_id=comment_id)
         dicted_response = [i.to_dict() for i in query_response]
@@ -88,24 +107,9 @@ def one_comment_by_user_id(request, user_id, comment_id):
         throw_bad_request()
 
 
-@login_required
-@returns_json
-def comments_list(request, bike_hire_docking_station_id):
-    if bike_hire_docking_station_id:
-        comments = Comment.objects.filter(bike_hire_docking_station_id=bike_hire_docking_station_id)
-        taking_by_page = int(request.GET.get('taking'))
-        paginator = Paginator(comments, taking_by_page)
-        page = request.GET.get('page')
-        comments_page = paginator.get_page(page)
-        return {"comments": comments_page, "count": paginator.count}
-    else:
-        throw_bad_request()
-
-
-@login_required
+@check_authorized
 @returns_json
 def comment_by_stop(request, stop_input):
-    check_authorized(request.user)
     stop_input = None
     if request.method == 'GET' and 'stop_input' in request.GET:
         stop_input = request.GET.get("stop_input", '')
@@ -117,10 +121,9 @@ def comment_by_stop(request, stop_input):
         throw_bad_request()
 
 
-@login_required
+@check_authorized
 @returns_json
 def comment_of_comment(request, comment_id):
-    check_authorized(request.user)
     if comment_id:
         query_response = Comment.objects.filter(comment_id=comment_id)
         dicted_response = [i.to_dict() for i in query_response]
@@ -130,26 +133,41 @@ def comment_of_comment(request, comment_id):
 
 
 # CREATE OPERATIONS
-@login_required
+@csrf_exempt
+@check_authorized
 def create_comment(request):
-    check_authorized(request.user)
+    body = json.loads(request.body.decode('utf-8'))
     text = None
     bike_hire_docking_station_id = None
-    if (request.method == 'POST' and 'text' in request.POST
-            and 'bike_hire_docking_station_id' in request.POST):
-        text = request.POST['text']
-        bike_hire_docking_station_id = request.POST['bike_hire_docking_station_id']
-    if text and bike_hire_docking_station_id:
-        comment = Comment(text=text, author=AppUser.objects.get(user=request.user),
-                          bike_hire_docking_station_id=bike_hire_docking_station_id)
+    comment_id = None
+    if request.method == 'POST' and 'comment' in body:
+        text = body['comment']
+        if bike_hire_docking_station_id in body and comment_id in body:
+            throw_bad_request()
+        elif bike_hire_docking_station_id in body:
+            bike_hire_docking_station_id = body['bikeDockingStationId']
+        elif comment_id in body:
+            comment_id = body['commentId']
+        else:
+            throw_bad_request()
+    if text and (bike_hire_docking_station_id or comment_id):
+        comment = Comment()
+        comment.text = text
+        comment.bike_hire_docking_station_id = bike_hire_docking_station_id
+        comment.answers_to = comment_id
+        author = AppUser.objects.get(user=request.user.id)
+        comment.author = author
         comment.save()
+        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
     else:
         throw_bad_request()
 
 
-@login_required
+@csrf_exempt
+@check_authorized
 def update_user(request):
-    check_authorized(request.user)
+    app_user = AppUser.objects.get_or_create(user=request.user.id)
+    body = json.loads(request.body.decode('utf-8'))
     username = None
     first_name = None
     last_name = None
@@ -158,34 +176,35 @@ def update_user(request):
     image = None
     description = None
     hobbies = None
-    if (request.method == 'POST' and 'username' in request.POST and 'first_name' in request.POST
-            and 'last_name' in request.POST and 'genre' in request.POST and 'dob' in request.POST
-            and 'image' in request.POST and 'description' in request.POST and 'hobbies' in request.POST):
-        username = request.POST['username']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        genre = request.POST['genre']
-        dob = request.POST['dob']
-        image = request.POST['image']
-        description = request.POST['description']
-        hobbies = request.POST['hobbies']
+    if (request.method == 'POST' and 'username' in body and 'first_name' in body
+            and 'last_name' in body and 'genre' in body and 'dob' in body
+            and 'image' in body and 'description' in body and 'hobbies' in body):
+        username = body['username']
+        first_name = body['first_name']
+        last_name = body['last_name']
+        genre = body['genre']
+        dob = body['dob']
+        image = body['image']
+        description = body['description']
+        hobbies = body['hobbies']
     if username and first_name and last_name and genre and dob and image and description and hobbies:
         request.user.username = username
         request.user.first_name = first_name
         request.user.last_name = last_name
-        user = AppUser.objects.get(user=request.user)
-        user.genre = genre
-        user.DoB = dob
-        user.image = image
-        user.description = description
-        user.hobbies = hobbies
+        app_user.genre = genre
+        app_user.DoB = dob
+        app_user.image = image
+        app_user.description = description
+        app_user.hobbies = hobbies
+        request.user.save()
+        app_user.save()
+        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
     else:
         throw_bad_request()
 
 
-@login_required
+@check_authorized
 def delete_comment(request):
-    check_authorized(request.user)
     comment_id = None
     if request.method == 'POST' and 'comment_id' in request.POST:
         comment_id = request.POST['comment_id']
@@ -200,18 +219,17 @@ def delete_comment(request):
         throw_bad_request()
 
 
-@login_required
+@check_authorized
 def delete_user(request):
-    check_authorized(request.user)
     request.user.delete()
 
 
 # FETCH API DATOS ABIERTOS
 
-@login_required
+# @check_authorized
+@check_authorized
 @returns_json
 def fetch_stations(request):
-    check_authorized(request.user)
     stations_json = datos_abiertos()
     stations = []
     for element in stations_json:
@@ -223,10 +241,9 @@ def fetch_stations(request):
     return stations
 
 
-@login_required
+@check_authorized
 @returns_json
 def fetch_station(request, station_id):
-    check_authorized(request.user)
     stations_json = datos_abiertos()
     output_dict = [element for element in stations_json if element['id'].split(':')[3] == station_id]
     output_dict = output_dict[0]
@@ -236,8 +253,8 @@ def fetch_station(request, station_id):
     return output_dict
 
 
-@login_required
 @csrf_exempt
+@check_authorized
 @returns_json
 def calculate_best_route(request):
     location = json.loads(request.body)['currentLocation']
@@ -246,9 +263,9 @@ def calculate_best_route(request):
     for element in stations_json:
         station_location = element['location']['value']['coordinates']
         distance_position[element['id']] = haversine(
-            (float(location[0]), float(location[1])),
-            (float(station_location[0]), float(station_location[1]))
-        )
+                (float(location[0]), float(location[1])),
+                (float(station_location[0]), float(station_location[1]))
+            )
 
     best_distance = sorted(distance_position.values())[0]
     best_distance_key = None
@@ -256,11 +273,9 @@ def calculate_best_route(request):
         if distance == best_distance:
             best_distance_key = identifier
 
-    return {
-        "location":
-            [element for element in stations_json if element['id'] == best_distance_key][0]['location']['value'][
-                'coordinates']
-    }
+    temp = [element for element in stations_json if element['id'] == best_distance_key][0]
+
+    return general_info_from_station(temp)
 
 
 @login_required

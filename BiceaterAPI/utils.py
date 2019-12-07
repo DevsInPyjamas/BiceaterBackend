@@ -1,5 +1,6 @@
 import requests
 import json
+import re
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 
@@ -25,5 +26,26 @@ def throw_forbidden():
     return HttpResponseForbidden()
 
 
-def find_station_by_id():
-    pass
+def general_info_from_station(datos_abiertos):
+    return {
+        "location":
+            datos_abiertos['location']['value']['coordinates'],
+        "direction":
+            re.sub(r'[_]+', ' ', datos_abiertos['address']['value']['streetAddress']),
+        "id":
+            datos_abiertos['id'].split(':')[3],
+        "totalSlotNumber":
+            datos_abiertos['totalSlotNumber']['value'],
+        "freeSlotNumber":
+            datos_abiertos['freeSlotNumber']['value'],
+        "availableBikeNumber":
+            datos_abiertos['availableBikeNumber']['value']
+    }
+
+
+def to_dict_auth_user(response_dict, user):
+    response_dict[user.id] = {
+        "username": user.username,
+        "id": user.id,
+        "email": user.email
+    }
