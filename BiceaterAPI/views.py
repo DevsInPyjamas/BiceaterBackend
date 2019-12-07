@@ -31,9 +31,10 @@ def all_users(request):
             to_dict_auth_user(response, user_email)
         return response
     else:
-        query_response = AppUser.objects.all()
-        dicted_response = [i.to_dict() for i in query_response]
-        return dicted_response
+        query_response = User.objects.all()
+        dict_response = {}
+        [to_dict_auth_user(dict_response, i) for i in query_response]
+        return dict_response
 
 
 @check_authorized
