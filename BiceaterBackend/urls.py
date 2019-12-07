@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth import logout
+# from django.contrib.auth import logout
 from django.urls import path, include
 
 from BiceaterBackend import settings
@@ -24,7 +24,5 @@ from BiceaterBackend import settings
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('api/', include('social_django.urls', namespace='social')),
-                  path('/api/logout/', logout, {'next_page': settings.LOGOUT_REDIRECT_URL},
-                       name='logout'),
                   url(r'^api/', include('BiceaterAPI.urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
