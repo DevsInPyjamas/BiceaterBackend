@@ -9,7 +9,7 @@ from django.template import RequestContext
 from .models import *
 import json
 from .decorators import returns_json, check_authorized
-from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station
+from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station, to_dict_auth_user
 from haversine import haversine
 from django.http import HttpResponse
 import re
@@ -20,24 +20,20 @@ import re
 @check_authorized
 @returns_json
 def all_users(request):
-    query_response = AppUser.objects.all()
-    dicted_response = [i.to_dict() for i in query_response]
-    return dicted_response
-
-
-@check_authorized
-@returns_json
-def users_by_username(request, user_input):
-    user_input = None
     if request.method == 'GET' and 'user_input' in request.GET:
         user_input = request.GET.get("user_input", '')
-    if user_input:
-        user = User.objects.filter(username__contains=user_input)
-        query_response = AppUser.objects.filter(user=user)
+        user_set = User.objects.filter(username__contains=user_input)
+        emails_set = User.objects.filter(email__contains=user_input)
+        response = {}
+        for user in user_set:
+            to_dict_auth_user(response, user)
+        for user_email in emails_set:
+            to_dict_auth_user(response, user_email)
+        return response
+    else:
+        query_response = AppUser.objects.all()
         dicted_response = [i.to_dict() for i in query_response]
         return dicted_response
-    else:
-        throw_bad_request()
 
 
 @check_authorized

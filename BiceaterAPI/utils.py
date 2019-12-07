@@ -41,3 +41,11 @@ def general_info_from_station(datos_abiertos):
         "availableBikeNumber":
             datos_abiertos['availableBikeNumber']['value']
     }
+
+
+def to_dict_auth_user(response_dict, user):
+    response_dict[user.id] = {
+        "username": user.username,
+        "id": user.id,
+        "email": user.email
+    }
