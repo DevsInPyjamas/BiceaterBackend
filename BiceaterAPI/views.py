@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from http import HTTPStatus
 # Create your views here.
@@ -279,7 +278,7 @@ def calculate_best_route(request):
     return general_info_from_station(temp)
 
 
-@login_required
+@check_authorized
 @returns_json
 def comments_parameters(request, comment_id):
     check_authorized(request.user)
@@ -293,7 +292,7 @@ def comments_parameters(request, comment_id):
         throw_bad_request()
 
 
-@login_required
+@check_authorized
 @returns_json
 def users_parameters(request, string):
     check_authorized(request.user)
