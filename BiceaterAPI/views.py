@@ -85,6 +85,8 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
+@check_authorized
+@returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
         comments = Comment.objects.filter(bike_hire_docking_station_id=station_id).order_by('-date')
