@@ -83,7 +83,7 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
-@check_authorized
+
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -110,7 +110,6 @@ def one_comment_by_user_id(request, user_id, comment_id):
         throw_bad_request()
 
 
-@check_authorized
 @returns_json
 def comment_by_stop(request, stop_input):
     stop_input = None
