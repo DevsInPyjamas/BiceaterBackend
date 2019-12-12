@@ -173,7 +173,7 @@ def create_comment(request):
 @csrf_exempt
 @check_authorized
 def update_user(request):
-    app_user = AppUser.objects.get_or_create(user=request.user)
+    app_user = AppUser.objects.get_or_create(user=request.user)[0]
     body = json.loads(request.body.decode('utf-8'))
     username = None
     first_name = None
