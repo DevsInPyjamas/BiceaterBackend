@@ -7,7 +7,10 @@ from django.core.paginator import Paginator
 from .models import *
 import json
 from .decorators import returns_json, check_authorized
-from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station, to_dict_auth_user
+from .utils \
+    import datos_abiertos, throw_bad_request, \
+    throw_forbidden, general_info_from_station, \
+    to_dict_auth_user, unique_entries
 from haversine import haversine
 from django.http import HttpResponse
 import re
@@ -22,12 +25,12 @@ def all_users(request):
         user_input = request.GET.get("user_input", '')
         user_set = User.objects.filter(username__contains=user_input)
         emails_set = User.objects.filter(email__contains=user_input)
-        response = {}
+        response = []
         for user in user_set:
             to_dict_auth_user(response, user)
         for user_email in emails_set:
             to_dict_auth_user(response, user_email)
-        return response
+        return unique_entries(response)
     else:
         query_response = User.objects.all()
         dict_response = {}
@@ -80,7 +83,7 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
-@check_authorized
+
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -107,7 +110,6 @@ def one_comment_by_user_id(request, user_id, comment_id):
         throw_bad_request()
 
 
-@check_authorized
 @returns_json
 def comment_by_stop(request, stop_input):
     stop_input = None
@@ -227,7 +229,6 @@ def delete_user(request):
 # FETCH API DATOS ABIERTOS
 
 # @check_authorized
-@check_authorized
 @returns_json
 def fetch_stations(request):
     stations_json = datos_abiertos()
@@ -241,7 +242,6 @@ def fetch_stations(request):
     return stations
 
 
-@check_authorized
 @returns_json
 def fetch_station(request, station_id):
     stations_json = datos_abiertos()
@@ -254,7 +254,6 @@ def fetch_station(request, station_id):
 
 
 @csrf_exempt
-@check_authorized
 @returns_json
 def calculate_best_route(request):
     location = json.loads(request.body)['currentLocation']
@@ -277,3 +276,30 @@ def calculate_best_route(request):
 
     return general_info_from_station(temp)
 
+
+@check_authorized
+@returns_json
+def comments_parameters(request, comment_id):
+    check_authorized(request.user)
+    if comment_id:
+        comment = Comment.objects.get(comment_id=comment_id)
+        query_response = AppUser.objects.get(comment=comment)
+        dicted_response = [query_response.to_dict()]
+        return dicted_response
+
+    else:
+        throw_bad_request()
+
+
+@check_authorized
+@returns_json
+def users_parameters(request, string):
+    check_authorized(request.user)
+    if string:
+        user = User.objects.filter(string)
+        query_response = AppUser.objects.get(user=user)
+        dicted_response = [query_response.to_dict()]
+        return dicted_response
+
+    else:
+        throw_bad_request()
