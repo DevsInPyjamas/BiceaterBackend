@@ -215,10 +215,8 @@ def update_user(request):
 
 
 @check_authorized
-def delete_comment(request):
-    comment_id = None
-    if request.method == 'POST' and 'comment_id' in request.POST:
-        comment_id = request.POST['comment_id']
+@returns_json
+def delete_comment(request, comment_id):
     if comment_id:
         comment = Comment.objects.get(comment_id=comment_id)
         user = AppUser.objects.get(user=request.user)
@@ -228,6 +226,7 @@ def delete_comment(request):
             throw_forbidden()
     else:
         throw_bad_request()
+    return {"ok": "ok"}
 
 
 @check_authorized
