@@ -17,7 +17,7 @@ class AppUser(models.Model):
         (FEMALE, 'Female')
     ]
     DoB = models.DateField(null=True)
-    image = models.ImageField(blank=True, upload_to='profile_images', default='../media/')
+    image = models.ImageField(blank=True, upload_to='profile_images')
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
@@ -57,7 +57,7 @@ class Comment(models.Model):
         null=True
     )
     bike_hire_docking_station_id = models.CharField(max_length=100,
-                                                    default='0')
+                                                    default='0', blank=True, null=True)
 
     def to_dict(self):
         if not self.answers_to:
