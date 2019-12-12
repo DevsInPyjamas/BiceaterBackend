@@ -17,7 +17,7 @@ class AppUser(models.Model):
         (FEMALE, 'Female')
     ]
     DoB = models.DateField(null=True)
-    image = models.ImageField(blank=True, upload_to='profile_images', default='../media/')
+    image = models.ImageField(blank=True, upload_to='profile_images')
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
