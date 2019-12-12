@@ -83,7 +83,7 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
-@check_authorized
+
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -111,6 +111,11 @@ def one_comment_by_user_id(request, user_id, comment_id):
 
 
 @check_authorized
+@returns_json
+def me(request):
+    return {"id": request.user.appuser.user_id}
+
+
 @returns_json
 def comment_by_stop(request, stop_input):
     stop_input = None
@@ -283,31 +288,3 @@ def calculate_best_route(request):
     temp = [element for element in stations_json if element['id'] == best_distance_key][0]
 
     return general_info_from_station(temp)
-
-
-@check_authorized
-@returns_json
-def comments_parameters(request, comment_id):
-    check_authorized(request.user)
-    if comment_id:
-        comment = Comment.objects.get(comment_id=comment_id)
-        query_response = AppUser.objects.get(comment=comment)
-        dicted_response = [query_response.to_dict()]
-        return dicted_response
-
-    else:
-        throw_bad_request()
-
-
-@check_authorized
-@returns_json
-def users_parameters(request, string):
-    check_authorized(request.user)
-    if string:
-        user = User.objects.filter(string)
-        query_response = AppUser.objects.get(user=user)
-        dicted_response = [query_response.to_dict()]
-        return dicted_response
-
-    else:
-        throw_bad_request()
