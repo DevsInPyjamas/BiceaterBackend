@@ -44,8 +44,18 @@ def general_info_from_station(datos_abiertos):
 
 
 def to_dict_auth_user(response_dict, user):
-    response_dict[user.id] = {
+    response_dict.append({
         "username": user.username,
         "id": user.id,
         "email": user.email
-    }
+    })
+
+
+def unique_entries(list):
+    seen_objects = set()
+    new_list = []
+    for obj in list:
+        if obj['username'] not in seen_objects:
+            new_list.append(obj)
+            seen_objects.add(obj['username'])
+    return new_list

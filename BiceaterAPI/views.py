@@ -7,7 +7,10 @@ from django.core.paginator import Paginator
 from .models import *
 import json
 from .decorators import returns_json, check_authorized
-from .utils import datos_abiertos, throw_bad_request, throw_forbidden, general_info_from_station, to_dict_auth_user
+from .utils \
+    import datos_abiertos, throw_bad_request, \
+    throw_forbidden, general_info_from_station, \
+    to_dict_auth_user, unique_entries
 from haversine import haversine
 from django.http import HttpResponse
 import re
@@ -22,12 +25,12 @@ def all_users(request):
         user_input = request.GET.get("user_input", '')
         user_set = User.objects.filter(username__contains=user_input)
         emails_set = User.objects.filter(email__contains=user_input)
-        response = {}
+        response = []
         for user in user_set:
             to_dict_auth_user(response, user)
         for user_email in emails_set:
             to_dict_auth_user(response, user_email)
-        return response
+        return unique_entries(response)
     else:
         query_response = User.objects.all()
         dict_response = {}
