@@ -57,7 +57,7 @@ class Comment(models.Model):
         null=True
     )
     bike_hire_docking_station_id = models.CharField(max_length=100,
-                                                    default='0')
+                                                    default='0', blank=True, null=True)
 
     def to_dict(self):
         if not self.answers_to:
