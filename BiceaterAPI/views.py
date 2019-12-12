@@ -230,7 +230,6 @@ def delete_user(request):
 # FETCH API DATOS ABIERTOS
 
 # @check_authorized
-@check_authorized
 @returns_json
 def fetch_stations(request):
     stations_json = datos_abiertos()
@@ -244,7 +243,6 @@ def fetch_stations(request):
     return stations
 
 
-@check_authorized
 @returns_json
 def fetch_station(request, station_id):
     stations_json = datos_abiertos()
@@ -257,7 +255,6 @@ def fetch_station(request, station_id):
 
 
 @csrf_exempt
-@check_authorized
 @returns_json
 def calculate_best_route(request):
     location = json.loads(request.body)['currentLocation']
