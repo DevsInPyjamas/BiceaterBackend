@@ -138,36 +138,44 @@ def comment_of_comment(request, comment_id):
 # CREATE OPERATIONS
 @csrf_exempt
 @check_authorized
+@returns_json
 def create_comment(request):
     body = json.loads(request.body.decode('utf-8'))
     text = None
-    bike_hire_docking_station_id = None
+    bikeDockingStationId = None
     comment_id = None
     if request.method == 'POST' and 'comment' in body:
         text = body['comment']
-        if bike_hire_docking_station_id in body and comment_id in body:
+        if bikeDockingStationId in body and comment_id in body:
             throw_bad_request()
-        elif bike_hire_docking_station_id in body:
-            bike_hire_docking_station_id = body['bikeDockingStationId']
+        elif 'bikeDockingStationId' in body:
+            bikeDockingStationId = body['bikeDockingStationId']
         elif comment_id in body:
             comment_id = body['commentId']
         else:
             throw_bad_request()
-    if text and (bike_hire_docking_station_id or comment_id):
+    if text and (bikeDockingStationId or comment_id):
         comment = Comment()
         comment.text = text
-        comment.bike_hire_docking_station_id = bike_hire_docking_station_id
+        comment.bike_hire_docking_station_id = bikeDockingStationId
         comment.answers_to = comment_id
-        author = AppUser.objects.get(user=request.user.id)
+        author = None
+        try:
+            author = AppUser.objects.get(user=request.user.id)
+        except Exception:
+            author = AppUser()
+            author.user = User.objects.get(id=request.user.id)
+            author.save()
         comment.author = author
         comment.save()
-        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
+        return {"ok": "ok"}
     else:
         throw_bad_request()
 
 
 @csrf_exempt
 @check_authorized
+@returns_json
 def update_user(request):
     app_user = AppUser.objects.get_or_create(user=request.user.id)
     body = json.loads(request.body.decode('utf-8'))
@@ -201,7 +209,7 @@ def update_user(request):
         app_user.hobbies = hobbies
         request.user.save()
         app_user.save()
-        return HttpResponse(content="Comment Created", status=HTTPStatus.OK)
+        return {"ok": "ok"}
     else:
         throw_bad_request()
 
