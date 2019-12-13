@@ -83,7 +83,6 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
-
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -182,34 +181,31 @@ def create_comment(request):
 @check_authorized
 @returns_json
 def update_user(request):
-    app_user = AppUser.objects.get_or_create(user=request.user.id)
+    app_user = AppUser.objects.get_or_create(user=request.user)[0]
     body = json.loads(request.body.decode('utf-8'))
     username = None
     first_name = None
     last_name = None
     genre = None
     dob = None
-    image = None
     description = None
     hobbies = None
-    if (request.method == 'POST' and 'username' in body and 'first_name' in body
-            and 'last_name' in body and 'genre' in body and 'dob' in body
-            and 'image' in body and 'description' in body and 'hobbies' in body):
+    if (request.method == 'POST' and 'username' in body and 'name' in body
+            and 'surname' in body and 'gender' in body and 'birthDate' in body
+            and 'bio' in body and 'hobbies' in body):
         username = body['username']
-        first_name = body['first_name']
-        last_name = body['last_name']
-        genre = body['genre']
-        dob = body['dob']
-        image = body['image']
-        description = body['description']
+        first_name = body['name']
+        last_name = body['surname']
+        genre = body['gender']
+        dob = body['birthDate']
+        description = body['bio']
         hobbies = body['hobbies']
-    if username and first_name and last_name and genre and dob and image and description and hobbies:
+    if username and first_name and last_name and genre and dob and description and hobbies:
         request.user.username = username
         request.user.first_name = first_name
         request.user.last_name = last_name
         app_user.genre = genre
         app_user.DoB = dob
-        app_user.image = image
         app_user.description = description
         app_user.hobbies = hobbies
         request.user.save()
