@@ -283,7 +283,7 @@ def calculate_best_route(request):
 def comments_parameters(request, comment_id):
     check_authorized(request.user)
     if comment_id:
-        comment = Comment.objects.get(comment_id=comment_id)
+        comment = Comment.objects.get(Comment.answers_to.comment_id)
         query_response = AppUser.objects.get(comment=comment)
         dicted_response = [query_response.to_dict()]
         return dicted_response
@@ -297,7 +297,7 @@ def comments_parameters(request, comment_id):
 def users_parameters(request, string):
     check_authorized(request.user)
     if string:
-        user = User.objects.filter(string)
+        user = User.objects.filter(username__icontains=string)
         query_response = AppUser.objects.get(user=user)
         dicted_response = [query_response.to_dict()]
         return dicted_response

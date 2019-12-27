@@ -19,5 +19,5 @@ urlpatterns = [
     url(r'^routes/calculate', views.calculate_best_route, name='Routing calculation'),
     url(r'^logout/', views.logout, name='logout'),
     url(r'^comments/(?P<comment_id>[0-9]+)/response$', views.comments_parameters, name='Comment parameters'),
-    url(r'^user/(?P<string>)/$', views.users_parameters, name='User parameters'),
+    url(r'^users/(?P<string>)/$', views.users_parameters, name='User parameters'),
 ]
