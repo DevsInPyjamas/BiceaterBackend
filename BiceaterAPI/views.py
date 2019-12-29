@@ -250,8 +250,8 @@ def delete_user(request):
 
 # FETCH API DATOS ABIERTOS
 
-# @cross_origin
-@check_authorized
+@cross_origin
+# @check_authorized
 @returns_json
 def fetch_stations(request):
     stations_json = datos_abiertos()

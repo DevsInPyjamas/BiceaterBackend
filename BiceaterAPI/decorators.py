@@ -32,7 +32,8 @@ def cross_origin(func):
         response = func(request)
         if isinstance(response, HttpResponse):
             response['Access-Control-Allow-Origin'] = 'https://biceater.herokuapp.com'
-            if response.method == 'OPTIONS':
+            response['Access-Control-Allow-Credentials'] = 'true'
+            if request.method == 'OPTIONS':
                 response['Access-Control-Allow-Methids'] = 'GET, POST, DELETE'
         return response
 
