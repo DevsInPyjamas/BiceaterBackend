@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 
 from .models import *
 import json
-from .decorators import returns_json, check_authorized
+from .decorators import returns_json, check_authorized, cross_origin
 from .utils \
     import datos_abiertos, throw_bad_request, \
     throw_forbidden, general_info_from_station, \
@@ -18,6 +18,7 @@ import re
 
 # READ OPERATIONS
 
+@cross_origin
 @check_authorized
 @returns_json
 def all_users(request):
@@ -38,6 +39,7 @@ def all_users(request):
         return dict_response
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def users_by_id(request, user_id):
@@ -50,6 +52,7 @@ def users_by_id(request, user_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def all_comments(request):
@@ -67,6 +70,7 @@ def logout(request):
     return {"message": "okey"}
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def comments_by_user_id(request, user_id):
@@ -83,6 +87,7 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
+@cross_origin
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -98,6 +103,7 @@ def comments_by_station_id(request, station_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def one_comment_by_user_id(request, user_id, comment_id):
@@ -109,12 +115,14 @@ def one_comment_by_user_id(request, user_id, comment_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def me(request):
     return {"id": request.user.appuser.user_id}
 
 
+@cross_origin
 @returns_json
 def comment_by_stop(request, stop_input):
     stop_input = None
@@ -128,6 +136,7 @@ def comment_by_stop(request, stop_input):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def comment_of_comment(request, comment_id):
@@ -141,6 +150,7 @@ def comment_of_comment(request, comment_id):
 
 # CREATE OPERATIONS
 @csrf_exempt
+@cross_origin
 @check_authorized
 @returns_json
 def create_comment(request):
@@ -178,6 +188,7 @@ def create_comment(request):
 
 
 @csrf_exempt
+@cross_origin
 @check_authorized
 @returns_json
 def update_user(request):
@@ -215,6 +226,7 @@ def update_user(request):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def delete_comment(request, comment_id):
@@ -230,6 +242,7 @@ def delete_comment(request, comment_id):
     return {"ok": "ok"}
 
 
+@cross_origin
 @check_authorized
 def delete_user(request):
     request.user.delete()
@@ -237,7 +250,8 @@ def delete_user(request):
 
 # FETCH API DATOS ABIERTOS
 
-# @check_authorized
+# @cross_origin
+@check_authorized
 @returns_json
 def fetch_stations(request):
     stations_json = datos_abiertos()
@@ -251,6 +265,7 @@ def fetch_stations(request):
     return stations
 
 
+@cross_origin
 @returns_json
 def fetch_station(request, station_id):
     stations_json = datos_abiertos()
@@ -262,6 +277,7 @@ def fetch_station(request, station_id):
     return output_dict
 
 
+@cross_origin
 @csrf_exempt
 @returns_json
 def calculate_best_route(request):

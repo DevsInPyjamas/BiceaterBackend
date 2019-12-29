@@ -25,3 +25,15 @@ def check_authorized(func):
         return response
 
     return check_authorized_decorator
+
+
+def cross_origin(func):
+    def cross_origin_decorator(request):
+        response = func(request)
+        if isinstance(response, HttpResponse):
+            response['Access-Control-Allow-Origin'] = 'https://biceater.herokuapp.com'
+            if response.method == 'OPTIONS':
+                response['Access-Control-Allow-Methids'] = 'GET, POST, DELETE'
+        return response
+
+    return cross_origin_decorator
