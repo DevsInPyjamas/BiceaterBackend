@@ -28,8 +28,8 @@ def check_authorized(func):
 
 
 def cross_origin(func):
-    def cross_origin_decorator(request):
-        response = func(request)
+    def cross_origin_decorator(request, *args, **kwargs):
+        response = func(request, *args, **kwargs)
         if isinstance(response, HttpResponse):
             response['Access-Control-Allow-Origin'] = 'https://biceater.herokuapp.com'
             response['Access-Control-Allow-Credentials'] = 'true'
