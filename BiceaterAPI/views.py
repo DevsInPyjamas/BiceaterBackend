@@ -277,8 +277,8 @@ def fetch_station(request, station_id):
     return output_dict
 
 
-@cross_origin
 @csrf_exempt
+@cross_origin
 @returns_json
 def calculate_best_route(request):
     location = json.loads(request.body)['currentLocation']

@@ -60,8 +60,7 @@ SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 
 # LOGIN_URL = '/api/login/google-oauth2/'
-
-LOGIN_REDIRECT_URL = 'http://biceater.herokuapp.com'
+LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL')
 LOGOUT_REDIRECT_URL = '/login'
 
 MIDDLEWARE = [
@@ -101,11 +100,11 @@ WSGI_APPLICATION = 'BiceaterBackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd4vfp69g5ee55c',
-        'USER': 'tyibmuizfzrzxz',
-        'PASSWORD': '902301bdd5388cc3e4da78aa270390a530071d94b866ead16ed4abe831ebc814',
-        'HOST': 'ec2-54-195-252-243.eu-west-1.compute.amazonaws.com',
-        'PORT': 5432,
+        'NAME': os.getenv('ENVIRONMENT_DATABASE'),
+        'USER': os.getenv('ENVIRONMENT_USER'),
+        'PASSWORD': os.getenv('ENVIRONMENT_PASSWORD'),
+        'HOST': os.getenv('ENVIRONMENT_HOST'),
+        'PORT': os.getenv('ENVIRONMENT_PORT'),
     }
 }
 
