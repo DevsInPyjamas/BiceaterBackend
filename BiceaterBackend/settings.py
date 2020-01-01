@@ -58,7 +58,6 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-
 # LOGIN_URL = '/api/login/google-oauth2/'
 LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL')
 LOGOUT_REDIRECT_URL = '/login'
