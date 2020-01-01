@@ -61,6 +61,7 @@ def all_comments(request):
     return dicted_response
 
 
+@cross_origin
 @returns_json
 def logout(request):
     user = getattr(request, 'user', None)

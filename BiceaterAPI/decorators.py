@@ -29,12 +29,17 @@ def check_authorized(func):
 
 def cross_origin(func):
     def cross_origin_decorator(request, *args, **kwargs):
-        response = func(request, *args, **kwargs)
+        # Fuck preflighted requests https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+        if request.method == 'OPTIONS':
+            response = HttpResponse()
+        else:
+            response = func(request, *args, **kwargs)
         if isinstance(response, HttpResponse):
             response['Access-Control-Allow-Origin'] = 'https://biceater.herokuapp.com'
             response['Access-Control-Allow-Credentials'] = 'true'
             if request.method == 'OPTIONS':
-                response['Access-Control-Allow-Methids'] = 'GET, POST, DELETE'
+                response['Access-Control-Allow-Methods'] = 'GET, POST'
+                response['Access-Control-Allow-Headers'] = 'content-type'
         return response
 
     return cross_origin_decorator
