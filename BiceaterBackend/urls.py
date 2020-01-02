@@ -24,7 +24,6 @@ from BiceaterBackend import settings
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('api/', include('social_django.urls', namespace='social')),
-                  path('logout/', logout, {'next_page': settings.LOGOUT_REDIRECT_URL},
-                       name='logout'),
+                  # path('logout/', logout, {'next_page': settings.LOGOUT_REDIRECT_URL}, name='logout'),
                   url(r'^api/', include('BiceaterAPI.urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
