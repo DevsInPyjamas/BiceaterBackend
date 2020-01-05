@@ -16,7 +16,7 @@ class AppUser(models.Model):
         (FEMALE, 'Female')
     ]
     DoB = models.DateField(null=True)
-    image = models.ImageField(blank=True, upload_to='profile_images', default='../media/')
+    image = models.ImageField(blank=True, upload_to='profile_images', null=True)
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
@@ -34,7 +34,8 @@ class AppUser(models.Model):
             'DoB': str(self.DoB),
             'image': self.image.path,
             'description': self.description,
-            'genre': self.genre
+            'genre': self.genre,
+            'hobbies': self.hobbies
         }
 
     def __str__(self):
@@ -56,7 +57,7 @@ class Comment(models.Model):
         null=True
     )
     bike_hire_docking_station_id = models.CharField(max_length=100,
-                                                    default='0')
+                                                    default='0', blank=True, null=True)
 
     def to_dict(self):
         if not self.answers_to:
