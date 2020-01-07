@@ -68,7 +68,7 @@ SESSION_COOKIE_SAMESITE = None
 SESSION_COOKIE_SECURE = bool(os.getenv('SOCIAL_AUTH_REDIRECT_IS_HTTPS'))
 # Okey https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
