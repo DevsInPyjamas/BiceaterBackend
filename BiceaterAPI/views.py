@@ -301,3 +301,18 @@ def calculate_best_route(request):
     temp = [element for element in stations_json if element['id'] == best_distance_key][0]
 
     return general_info_from_station(temp)
+
+
+@csrf_exempt
+@cross_origin
+@returns_json
+def search_station_by_address(request):
+    address = json.loads(request.body)['stationAddress']
+    stations_json = datos_abiertos()
+    station = {}
+    for element in stations_json:
+        station_address = re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])
+        if str.lower(station_address).__contains__(str.lower(address)):
+            station = element
+            station['id'] = station['id'].split(':')[3]
+    return station
