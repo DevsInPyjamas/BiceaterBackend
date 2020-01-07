@@ -314,5 +314,6 @@ def search_station_by_address(request):
         station_address = re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])
         if str.lower(station_address).__contains__(str.lower(address)):
             station = element
+            station['address']['value']['streetAddress'] = re.sub(r'[_]+', ' ', station['address']['value']['streetAddress'])
             station['id'] = station['id'].split(':')[3]
     return station
