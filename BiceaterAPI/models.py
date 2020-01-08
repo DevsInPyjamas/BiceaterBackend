@@ -24,6 +24,7 @@ class AppUser(models.Model):
         default=MALE
     )
     hobbies = models.TextField(blank=True)
+    isAdmin = models.BooleanField(default=False)
 
     def to_dict(self):
         return {

@@ -234,7 +234,7 @@ def delete_comment(request, comment_id):
     if comment_id:
         comment = Comment.objects.get(comment_id=comment_id)
         user = AppUser.objects.get(user=request.user)
-        if comment.author == user:
+        if comment.author == user | comment.author.isAdmin:
             comment.delete()
         else:
             throw_forbidden()
