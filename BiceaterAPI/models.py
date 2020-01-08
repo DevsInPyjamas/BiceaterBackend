@@ -36,7 +36,8 @@ class AppUser(models.Model):
             'image': self.image.path,
             'description': self.description,
             'genre': self.genre,
-            'hobbies': self.hobbies
+            'hobbies': self.hobbies,
+            'isAdmin': self.isAdmin
         }
 
     def __str__(self):
