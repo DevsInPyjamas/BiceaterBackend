@@ -4,7 +4,7 @@ from django.urls import path
 from BiceaterAPI import views
 
 urlpatterns = [
-    url(r'^users/me/?$', views.me, name='literalmente mi puta id'),
+    url(r'^users/me/?$', views.me, name='My User ID'),
     url(r'^users/?$', views.all_users, name='All users'),
     url(r'^users/(?P<user_id>[0-9]+)/?$', views.users_by_id, name='Users by ID'),
     url(r'^users/(?P<user_id>[0-9]+)/comments/(?P<comment_id>[0-9]+)/?$', views.one_comment_by_user_id,
