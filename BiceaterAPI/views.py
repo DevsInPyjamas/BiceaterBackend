@@ -193,8 +193,9 @@ def create_comment(request):
 @check_authorized
 @returns_json
 def update_user(request):
-    app_user = AppUser.objects.get_or_create(user=request.user)[0]
     body = json.loads(request.body.decode('utf-8'))
+
+    user_id = None
     username = None
     first_name = None
     last_name = None
@@ -202,9 +203,10 @@ def update_user(request):
     dob = None
     description = None
     hobbies = None
-    if (request.method == 'POST' and 'username' in body and 'name' in body
+    if (request.method == 'POST' and 'user_id' in body and 'username' in body and 'name' in body
             and 'surname' in body and 'gender' in body and 'birthDate' in body
             and 'bio' in body and 'hobbies' in body):
+        user_id = body['user_id']
         username = body['username']
         first_name = body['name']
         last_name = body['surname']
@@ -213,6 +215,7 @@ def update_user(request):
         description = body['bio']
         hobbies = body['hobbies']
     if username and first_name and last_name and genre and dob and description and hobbies:
+        app_user = AppUser.objects.get_or_create(user_id=user_id)[0]
         request.user.username = username
         request.user.first_name = first_name
         request.user.last_name = last_name
