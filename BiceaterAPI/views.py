@@ -193,18 +193,11 @@ def create_comment(request):
 @check_authorized
 @returns_json
 def update_user(request):
-    app_user = AppUser.objects.get_or_create(user=request.user)[0]
     body = json.loads(request.body.decode('utf-8'))
-    username = None
-    first_name = None
-    last_name = None
-    genre = None
-    dob = None
-    description = None
-    hobbies = None
-    if (request.method == 'POST' and 'username' in body and 'name' in body
+    if (request.method == 'POST' and 'userId' in body and 'username' in body and 'name' in body
             and 'surname' in body and 'gender' in body and 'birthDate' in body
             and 'bio' in body and 'hobbies' in body):
+        user_id = body['userId']
         username = body['username']
         first_name = body['name']
         last_name = body['surname']
@@ -212,15 +205,15 @@ def update_user(request):
         dob = body['birthDate']
         description = body['bio']
         hobbies = body['hobbies']
-    if username and first_name and last_name and genre and dob and description and hobbies:
-        request.user.username = username
-        request.user.first_name = first_name
-        request.user.last_name = last_name
+        app_user = AppUser.objects.get_or_create(user_id=user_id)[0]
+
+        app_user.user.username = username
+        app_user.user.first_name = first_name
+        app_user.user.last_name = last_name
         app_user.genre = genre
         app_user.DoB = dob
         app_user.description = description
         app_user.hobbies = hobbies
-        request.user.save()
         app_user.save()
         return {"ok": "ok"}
     else:
@@ -234,7 +227,7 @@ def delete_comment(request, comment_id):
     if comment_id:
         comment = Comment.objects.get(comment_id=comment_id)
         user = AppUser.objects.get(user=request.user)
-        if comment.author == user:
+        if comment.author == user | comment.author.isAdmin:
             comment.delete()
         else:
             throw_forbidden()
@@ -301,3 +294,17 @@ def calculate_best_route(request):
     temp = [element for element in stations_json if element['id'] == best_distance_key][0]
 
     return general_info_from_station(temp)
+
+
+@csrf_exempt
+@cross_origin
+@returns_json
+def search_station_by_address(request):
+    address = json.loads(request.body)['stationAddress']
+    stations_json = datos_abiertos()
+    stations = [element for element in stations_json if str.lower(re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])).__contains__(str.lower(address))]
+    for element in stations:
+        element['address']['value']['streetAddress'] = re.sub(r'[_]+', ' ',
+                                                              element['address']['value']['streetAddress'])
+        element['id'] = element['id'].split(':')[3]
+    return stations
