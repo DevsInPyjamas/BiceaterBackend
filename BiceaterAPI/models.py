@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
 # Create your models here.
 
 
@@ -17,7 +16,7 @@ class AppUser(models.Model):
         (FEMALE, 'Female')
     ]
     DoB = models.DateField(null=True)
-    image = models.ImageField(blank=True, upload_to='profile_images')
+    image = models.ImageField(blank=True, upload_to='profile_images', null=True)
     description = models.TextField(blank=True)
     genre = models.CharField(
         max_length=1,
@@ -25,6 +24,7 @@ class AppUser(models.Model):
         default=MALE
     )
     hobbies = models.TextField(blank=True)
+    isAdmin = models.BooleanField(default=False)
 
     def to_dict(self):
         return {
@@ -35,7 +35,9 @@ class AppUser(models.Model):
             'DoB': str(self.DoB),
             'image': self.image.path,
             'description': self.description,
-            'genre': self.genre
+            'genre': self.genre,
+            'hobbies': self.hobbies,
+            'isAdmin': self.isAdmin
         }
 
     def __str__(self):

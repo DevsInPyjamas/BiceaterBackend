@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 
 from .models import *
 import json
-from .decorators import returns_json, check_authorized
+from .decorators import returns_json, check_authorized, cross_origin
 from .utils \
     import datos_abiertos, throw_bad_request, \
     throw_forbidden, general_info_from_station, \
@@ -18,6 +18,7 @@ import re
 
 # READ OPERATIONS
 
+@cross_origin
 @check_authorized
 @returns_json
 def all_users(request):
@@ -38,6 +39,7 @@ def all_users(request):
         return dict_response
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def users_by_id(request, user_id):
@@ -50,6 +52,7 @@ def users_by_id(request, user_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def all_comments(request):
@@ -58,6 +61,7 @@ def all_comments(request):
     return dicted_response
 
 
+@cross_origin
 @returns_json
 def logout(request):
     user = getattr(request, 'user', None)
@@ -67,6 +71,7 @@ def logout(request):
     return {"message": "okey"}
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def comments_by_user_id(request, user_id):
@@ -83,7 +88,7 @@ def comments_by_user_id(request, user_id):
         throw_bad_request()
 
 
-
+@cross_origin
 @returns_json
 def comments_by_station_id(request, station_id):
     if station_id:
@@ -99,6 +104,7 @@ def comments_by_station_id(request, station_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def one_comment_by_user_id(request, user_id, comment_id):
@@ -110,12 +116,14 @@ def one_comment_by_user_id(request, user_id, comment_id):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def me(request):
     return {"id": request.user.appuser.user_id}
 
 
+@cross_origin
 @returns_json
 def comment_by_stop(request, stop_input):
     stop_input = None
@@ -129,6 +137,7 @@ def comment_by_stop(request, stop_input):
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def comment_of_comment(request, comment_id):
@@ -142,6 +151,7 @@ def comment_of_comment(request, comment_id):
 
 # CREATE OPERATIONS
 @csrf_exempt
+@cross_origin
 @check_authorized
 @returns_json
 def create_comment(request):
@@ -179,52 +189,68 @@ def create_comment(request):
 
 
 @csrf_exempt
+@cross_origin
 @check_authorized
-def update_user(request):
-    app_user = AppUser.objects.get_or_create(user=request.user.id)
+@returns_json
+def create_rating(request):
     body = json.loads(request.body.decode('utf-8'))
-    username = None
-    first_name = None
-    last_name = None
-    genre = None
-    dob = None
-    image = None
-    description = None
-    hobbies = None
-    if (request.method == 'POST' and 'username' in body and 'first_name' in body
-            and 'last_name' in body and 'genre' in body and 'dob' in body
-            and 'image' in body and 'description' in body and 'hobbies' in body):
+    rating = None
+    author = request.user.appuser
+    station_id = None
+    if request.method == 'POST' and 'rating' in body and 'station_id' in body:
+        rating = body['rating']
+        station_id = body['station_id']
+    if rating and author and station_id:
+        rating_object = Rating()
+        rating_object.rating = rating
+        rating_object.author = author
+        rating_object.bike_hire_docking_station_id = station_id
+        rating_object.save()
+        return {'ok': 'ok'}
+    else:
+        throw_bad_request()
+
+
+@csrf_exempt
+@cross_origin
+@check_authorized
+@returns_json
+def update_user(request):
+    body = json.loads(request.body.decode('utf-8'))
+    if (request.method == 'POST' and 'userId' in body and 'username' in body and 'name' in body
+            and 'surname' in body and 'gender' in body and 'birthDate' in body
+            and 'bio' in body and 'hobbies' in body):
+        user_id = body['userId']
         username = body['username']
-        first_name = body['first_name']
-        last_name = body['last_name']
-        genre = body['genre']
-        dob = body['dob']
-        image = body['image']
-        description = body['description']
+        first_name = body['name']
+        last_name = body['surname']
+        genre = body['gender']
+        dob = body['birthDate']
+        description = body['bio']
         hobbies = body['hobbies']
-    if username and first_name and last_name and genre and dob and image and description and hobbies:
-        request.user.username = username
-        request.user.first_name = first_name
-        request.user.last_name = last_name
+        app_user = AppUser.objects.get_or_create(user_id=user_id)[0]
+
+        app_user.user.username = username
+        app_user.user.first_name = first_name
+        app_user.user.last_name = last_name
         app_user.genre = genre
         app_user.DoB = dob
-        app_user.image = image
         app_user.description = description
         app_user.hobbies = hobbies
-        request.user.save()
         app_user.save()
         return {"ok": "ok"}
     else:
         throw_bad_request()
 
 
+@cross_origin
 @check_authorized
 @returns_json
 def delete_comment(request, comment_id):
     if comment_id:
         comment = Comment.objects.get(comment_id=comment_id)
         user = AppUser.objects.get(user=request.user)
-        if comment.author == user:
+        if comment.author == user | comment.author.isAdmin:
             comment.delete()
         else:
             throw_forbidden()
@@ -233,6 +259,7 @@ def delete_comment(request, comment_id):
     return {"ok": "ok"}
 
 
+@cross_origin
 @check_authorized
 def delete_user(request):
     request.user.delete()
@@ -240,6 +267,7 @@ def delete_user(request):
 
 # FETCH API DATOS ABIERTOS
 
+@cross_origin
 # @check_authorized
 @returns_json
 def fetch_stations(request):
@@ -254,6 +282,7 @@ def fetch_stations(request):
     return stations
 
 
+@cross_origin
 @returns_json
 def fetch_station(request, station_id):
     stations_json = datos_abiertos()
@@ -266,6 +295,7 @@ def fetch_station(request, station_id):
 
 
 @csrf_exempt
+@cross_origin
 @returns_json
 def calculate_best_route(request):
     location = json.loads(request.body)['currentLocation']
@@ -274,9 +304,9 @@ def calculate_best_route(request):
     for element in stations_json:
         station_location = element['location']['value']['coordinates']
         distance_position[element['id']] = haversine(
-            (float(location[0]), float(location[1])),
-            (float(station_location[0]), float(station_location[1]))
-        )
+                (float(location[0]), float(location[1])),
+                (float(station_location[0]), float(station_location[1]))
+            )
 
     best_distance = sorted(distance_position.values())[0]
     best_distance_key = None
@@ -287,6 +317,34 @@ def calculate_best_route(request):
     temp = [element for element in stations_json if element['id'] == best_distance_key][0]
 
     return general_info_from_station(temp)
+
+
+@csrf_exempt
+@cross_origin
+@returns_json
+def search_station_by_address(request):
+    address = json.loads(request.body)['stationAddress']
+    stations_json = datos_abiertos()
+    stations = [element for element in stations_json if str.lower(re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])).__contains__(str.lower(address))]
+    for element in stations:
+        element['address']['value']['streetAddress'] = re.sub(r'[_]+', ' ',
+                                                              element['address']['value']['streetAddress'])
+        element['id'] = element['id'].split(':')[3]
+    return stations
+
+
+@csrf_exempt
+@cross_origin
+@returns_json
+def rating_average(request, station_id):
+    ratings = Rating.objects.filter(bike_hire_docking_station_id=station_id)
+    if station_id and ratings and ratings.count() != 0:
+        total = 0
+        for rating in ratings:
+            total += rating.rating
+        return total/ratings.count()
+    else:
+        return 0
 
 
 @check_authorized

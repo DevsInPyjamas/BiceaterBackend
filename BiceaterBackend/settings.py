@@ -58,11 +58,17 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-
 # LOGIN_URL = '/api/login/google-oauth2/'
-
-LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL')
 LOGOUT_REDIRECT_URL = '/login'
+
+# Okey https://github.com/python-social-auth/social-core/issues/250
+SESSION_COOKIE_SAMESITE = None
+# SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
+SESSION_COOKIE_SECURE = bool(os.getenv('SOCIAL_AUTH_REDIRECT_IS_HTTPS'))
+# Okey https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_SSL_REDIRECT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
