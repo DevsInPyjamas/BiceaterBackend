@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^logout/?$', views.logout, name='logout'),
     url(r'^stations/search/?', views.search_station_by_address, name='Search station by address'),
     url(r'^rating/create/?$', views.create_rating, name='Create new rating'),
-    url(r'^rating/average/?$', views.rating_average, name='Rating average'),
+    url(r'^rating/average/(?P<station_id>[0-9]+)?$', views.rating_average, name='Rating average'),
 ]
