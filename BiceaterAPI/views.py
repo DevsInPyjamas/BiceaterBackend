@@ -263,9 +263,9 @@ def calculate_best_route(request):
     for element in stations_json:
         station_location = element['location']['value']['coordinates']
         distance_position[element['id']] = haversine(
-                (float(location[0]), float(location[1])),
-                (float(station_location[0]), float(station_location[1]))
-            )
+            (float(location[0]), float(location[1])),
+            (float(station_location[0]), float(station_location[1]))
+        )
 
     best_distance = sorted(distance_position.values())[0]
     best_distance_key = None
@@ -283,8 +283,7 @@ def calculate_best_route(request):
 def comments_parameters(request, comment_id):
     check_authorized(request.user)
     if comment_id:
-        comment = Comment.objects.get(Comment.answers_to.comment_id)
-        query_response = AppUser.objects.get(comment=comment)
+        query_response = Comment.objects.get(comment_id=comment_id)
         dicted_response = [query_response.to_dict()]
         return dicted_response
 
@@ -299,6 +298,20 @@ def users_parameters(request, string):
     if string:
         user = User.objects.filter(username__icontains=string)
         query_response = AppUser.objects.get(user=user)
+        dicted_response = [query_response.to_dict()]
+        return dicted_response
+
+    else:
+        throw_bad_request()
+
+
+@check_authorized
+@returns_json
+def comments_responses(request, comment_id):
+    check_authorized(request.user)
+    if comment_id:
+        comment = Comment.objects.get(comment_id=comment_id)
+        query_response = comment.answers_to
         dicted_response = [query_response.to_dict()]
         return dicted_response
 
