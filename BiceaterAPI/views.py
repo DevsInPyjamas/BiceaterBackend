@@ -192,6 +192,29 @@ def create_comment(request):
 @cross_origin
 @check_authorized
 @returns_json
+def create_rating(request):
+    body = json.loads(request.body.decode('utf-8'))
+    rating = None
+    author = request.user.appuser
+    station_id = None
+    if request.method == 'POST' and 'rating' in body and 'station_id' in body:
+        rating = body['rating']
+        station_id = body['station_id']
+    if rating and author and station_id:
+        rating_object = Rating()
+        rating_object.rating = rating
+        rating_object.author = author
+        rating_object.bike_hire_docking_station_id = station_id
+        rating_object.save()
+        return {'ok': 'ok'}
+    else:
+        throw_bad_request()
+
+
+@csrf_exempt
+@cross_origin
+@check_authorized
+@returns_json
 def update_user(request):
     body = json.loads(request.body.decode('utf-8'))
     if (request.method == 'POST' and 'userId' in body and 'username' in body and 'name' in body
@@ -308,3 +331,17 @@ def search_station_by_address(request):
                                                               element['address']['value']['streetAddress'])
         element['id'] = element['id'].split(':')[3]
     return stations
+
+
+@csrf_exempt
+@cross_origin
+@returns_json
+def rating_average(request, station_id):
+    ratings = Rating.objects.filter(bike_hire_docking_station_id=station_id)
+    if station_id and ratings and ratings.count() != 0:
+        total = 0
+        for rating in ratings:
+            total += rating.rating
+        return total/ratings.count()
+    else:
+        return 0
