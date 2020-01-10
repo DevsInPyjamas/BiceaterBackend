@@ -350,7 +350,6 @@ def rating_average(request, station_id):
 @check_authorized
 @returns_json
 def comments_parameters(request, comment_id):
-    check_authorized(request.user)
     if comment_id:
         query_response = Comment.objects.get(comment_id=comment_id)
         dicted_response = [query_response.to_dict()]
@@ -363,7 +362,6 @@ def comments_parameters(request, comment_id):
 @check_authorized
 @returns_json
 def users_parameters(request, string):
-    check_authorized(request.user)
     if string:
         user = User.objects.filter(username__icontains=string)
         query_response = AppUser.objects.get(user=user)
@@ -377,12 +375,13 @@ def users_parameters(request, string):
 @check_authorized
 @returns_json
 def comments_responses(request, comment_id):
-    check_authorized(request.user)
-    if comment_id:
-        comment = Comment.objects.get(comment_id=comment_id)
+    comment = Comment.objects.get(comment_id=comment_id)
+    if comment:
         query_response = comment.answers_to
-        dicted_response = [query_response.to_dict()]
-        return dicted_response
-
+        if query_response:
+            dicted_response = [query_response.to_dict()]
+            return dicted_response
+        else:
+            throw_bad_request()
     else:
         throw_bad_request()
