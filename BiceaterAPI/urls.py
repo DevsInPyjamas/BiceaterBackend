@@ -22,5 +22,7 @@ urlpatterns = [
     url(r'^users/update/?$', views.update_user, name="Update user"),
     url(r'^routes/calculate/?$', views.calculate_best_route, name='Routing calculation'),
     url(r'^logout/?$', views.logout, name='logout'),
-    url(r'^stations/search', views.search_station_by_address, name='Search station by address')
+    url(r'^stations/search/?', views.search_station_by_address, name='Search station by address'),
+    url(r'^rating/create/?$', views.create_rating, name='Create new rating'),
+    url(r'^rating/average/?$', views.rating_average, name='Rating average'),
 ]
