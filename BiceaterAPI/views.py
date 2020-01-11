@@ -237,6 +237,7 @@ def update_user(request):
         app_user.DoB = dob
         app_user.description = description
         app_user.hobbies = hobbies
+        app_user.user.save()
         app_user.save()
         return {"ok": "ok"}
     else:

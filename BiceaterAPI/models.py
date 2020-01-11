@@ -33,7 +33,7 @@ class AppUser(models.Model):
             'name': self.user.first_name,
             'surname': self.user.last_name,
             'DoB': str(self.DoB),
-            'image': self.image.path,
+            # 'image': self.image.path,
             'description': self.description,
             'genre': self.genre,
             'hobbies': self.hobbies,
