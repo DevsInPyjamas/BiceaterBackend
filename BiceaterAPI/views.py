@@ -161,19 +161,20 @@ def create_comment(request):
     comment_id = None
     if request.method == 'POST' and 'comment' in body:
         text = body['comment']
-        if bikeDockingStationId in body and comment_id in body:
-            throw_bad_request()
+        if 'bikeDockingStationId' in body and 'comment_id' in body:
+            bikeDockingStationId = body['bikeDockingStationId']
+            comment_id = body['comment_id']
         elif 'bikeDockingStationId' in body:
             bikeDockingStationId = body['bikeDockingStationId']
-        elif comment_id in body:
-            comment_id = body['commentId']
+        elif 'comment_id' in body:
+            comment_id = body['comment_id']
         else:
             throw_bad_request()
     if text and (bikeDockingStationId or comment_id):
         comment = Comment()
         comment.text = text
         comment.bike_hire_docking_station_id = bikeDockingStationId
-        comment.answers_to = comment_id
+        comment.answers_to_id = comment_id
         author = None
         try:
             author = AppUser.objects.get(user=request.user.id)
@@ -376,11 +377,12 @@ def users_parameters(request, string):
 @check_authorized
 @returns_json
 def comments_responses(request, comment_id):
-    comment = Comment.objects.get(comment_id=comment_id)
-    if comment:
-        query_response = comment.answers_to
+
+    if comment_id:
+        bbbb = int(comment_id)
+        query_response = Comment.objects.filter(answers_to__comment_id=bbbb).order_by('-date')
         if query_response:
-            dicted_response = [query_response.to_dict()]
+            dicted_response = [i.to_dict() for i in query_response]
             return dicted_response
         else:
             throw_bad_request()
