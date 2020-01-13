@@ -14,7 +14,6 @@ urlpatterns = [
     url(r'^comments(?P<stop_input>)/?$', views.comment_by_stop, name='Stops comments'),
     url(r'^comments/(?P<comment_id>[0-9]+)/?$', views.comment_of_comment, name='Comments of comments'),
     url(r'^comments/(?P<comment_id>[0-9]+)/delete/?$', views.delete_comment, name='Comments of comments'),
-    url(r'^comments/(?P<comment_id>[0-9]+)/responses/?$', views.comment_of_comment, name='Comments of comments'),
     url(r'^stations/(?P<station_id>[0-9]+)/?$', views.fetch_station, name='Fetch Station'),
     url(r'^stations/?$', views.fetch_stations, name='Fetch All Stations'),
     url(r'^stations/(?P<station_id>[0-9]+)/comments/?$', views.comments_by_station_id, name='Comments by station'),
@@ -25,4 +24,7 @@ urlpatterns = [
     url(r'^stations/search/?', views.search_station_by_address, name='Search station by address'),
     url(r'^rating/create/?$', views.create_rating, name='Create new rating'),
     url(r'^rating/average/(?P<station_id>[0-9]+)?$', views.rating_average, name='Rating average'),
+    url(r'^comments/(?P<comment_id>[0-9]+)/comment/$', views.comments_parameters, name='Comment parameters'),
+    url(r'^comments/(?P<comment_id>[0-9]+)/responses/$', views.comments_responses, name='Comment responses'),
+    url(r'^users/(?P<string>)/$', views.users_parameters, name='User parameters'),
 ]

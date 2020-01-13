@@ -161,19 +161,20 @@ def create_comment(request):
     comment_id = None
     if request.method == 'POST' and 'comment' in body:
         text = body['comment']
-        if bikeDockingStationId in body and comment_id in body:
-            throw_bad_request()
+        if 'bikeDockingStationId' in body and 'comment_id' in body:
+            bikeDockingStationId = body['bikeDockingStationId']
+            comment_id = body['comment_id']
         elif 'bikeDockingStationId' in body:
             bikeDockingStationId = body['bikeDockingStationId']
-        elif comment_id in body:
-            comment_id = body['commentId']
+        elif 'comment_id' in body:
+            comment_id = body['comment_id']
         else:
             throw_bad_request()
     if text and (bikeDockingStationId or comment_id):
         comment = Comment()
         comment.text = text
         comment.bike_hire_docking_station_id = bikeDockingStationId
-        comment.answers_to = comment_id
+        comment.answers_to_id = comment_id
         author = None
         try:
             author = AppUser.objects.get(user=request.user.id)
@@ -230,15 +231,21 @@ def update_user(request):
         hobbies = body['hobbies']
         app_user = AppUser.objects.get_or_create(user_id=user_id)[0]
 
-        app_user.user.username = username
-        app_user.user.first_name = first_name
-        app_user.user.last_name = last_name
-        app_user.genre = genre
-        app_user.DoB = dob
-        app_user.description = description
-        app_user.hobbies = hobbies
-        app_user.save()
-        return {"ok": "ok"}
+        user = AppUser.objects.get(user=request.user)
+
+        if user != app_user:
+            throw_forbidden()
+        else:
+            app_user.user.username = username
+            app_user.user.first_name = first_name
+            app_user.user.last_name = last_name
+            app_user.genre = genre
+            app_user.DoB = dob
+            app_user.description = description
+            app_user.hobbies = hobbies
+            app_user.user.save()
+            app_user.save()
+            return {"ok": "ok"}
     else:
         throw_bad_request()
 
@@ -345,3 +352,44 @@ def rating_average(request, station_id):
         return total/ratings.count()
     else:
         return 0
+
+
+@check_authorized
+@returns_json
+def comments_parameters(request, comment_id):
+    if comment_id:
+        query_response = Comment.objects.get(comment_id=comment_id)
+        dicted_response = [query_response.to_dict()]
+        return dicted_response
+
+    else:
+        throw_bad_request()
+
+
+@check_authorized
+@returns_json
+def users_parameters(request, string):
+    if string:
+        user = User.objects.filter(username__icontains=string)
+        query_response = AppUser.objects.get(user=user)
+        dicted_response = [query_response.to_dict()]
+        return dicted_response
+
+    else:
+        throw_bad_request()
+
+
+@check_authorized
+@returns_json
+def comments_responses(request, comment_id):
+
+    if comment_id:
+        bbbb = int(comment_id)
+        query_response = Comment.objects.filter(answers_to__comment_id=bbbb).order_by('-date')
+        if query_response:
+            dicted_response = [i.to_dict() for i in query_response]
+            return dicted_response
+        else:
+            throw_bad_request()
+    else:
+        throw_bad_request()
