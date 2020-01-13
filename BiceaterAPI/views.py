@@ -231,16 +231,21 @@ def update_user(request):
         hobbies = body['hobbies']
         app_user = AppUser.objects.get_or_create(user_id=user_id)[0]
 
-        app_user.user.username = username
-        app_user.user.first_name = first_name
-        app_user.user.last_name = last_name
-        app_user.genre = genre
-        app_user.DoB = dob
-        app_user.description = description
-        app_user.hobbies = hobbies
-        app_user.user.save()
-        app_user.save()
-        return {"ok": "ok"}
+        user = AppUser.objects.get(user=request.user)
+
+        if user != app_user:
+            throw_forbidden()
+        else:
+            app_user.user.username = username
+            app_user.user.first_name = first_name
+            app_user.user.last_name = last_name
+            app_user.genre = genre
+            app_user.DoB = dob
+            app_user.description = description
+            app_user.hobbies = hobbies
+            app_user.user.save()
+            app_user.save()
+            return {"ok": "ok"}
     else:
         throw_bad_request()
 
