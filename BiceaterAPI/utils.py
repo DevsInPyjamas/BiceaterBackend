@@ -29,11 +29,11 @@ def throw_forbidden():
 def general_info_from_station(datos_abiertos):
     return {
         "location":
-            datos_abiertos['location']['value']['coordinates'],
+            [datos_abiertos['location']['value']['coordinates'][1], datos_abiertos['location']['value']['coordinates'][0]],
         "direction":
-            re.sub(r'[_]+', ' ', datos_abiertos['address']['value']['streetAddress']),
+            datos_abiertos['address']['value']['streetAddress'],
         "id":
-            datos_abiertos['id'].split(':')[3],
+            datos_abiertos['id'].split('-')[1],
         "totalSlotNumber":
             datos_abiertos['totalSlotNumber']['value'],
         "freeSlotNumber":

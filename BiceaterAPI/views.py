@@ -257,7 +257,7 @@ def delete_comment(request, comment_id):
     if comment_id:
         comment = Comment.objects.get(comment_id=comment_id)
         user = AppUser.objects.get(user=request.user)
-        if comment.author == user | comment.author.isAdmin:
+        if comment.author == user or comment.author.isAdmin:
             comment.delete()
         else:
             throw_forbidden()
@@ -282,9 +282,10 @@ def fetch_stations(request):
     stations = []
     for element in stations_json:
         location = element['location']['value']
+        location['coordinates'] = [location['coordinates'][1], location['coordinates'][0]]
         address = element['address']['value']
-        address['streetAddress'] = re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])
-        station_id = element['id'].split(':')[3]
+        address['streetAddress'] = element['address']['value']['streetAddress']
+        station_id = element['id'].split('-')[1]
         stations.append({station_id: [location, address]})
     return stations
 
@@ -293,11 +294,10 @@ def fetch_stations(request):
 @returns_json
 def fetch_station(request, station_id):
     stations_json = datos_abiertos()
-    output_dict = [element for element in stations_json if element['id'].split(':')[3] == station_id]
+    output_dict = [element for element in stations_json if element['id'].split('-')[1] == station_id]
     output_dict = output_dict[0]
-    output_dict['address']['value']['streetAddress'] = \
-        re.sub(r'[_]+', ' ', output_dict['address']['value']['streetAddress'])
-    output_dict['id'] = output_dict['id'].split(':')[3]
+    output_dict['location']['value']['coordinates'] = [output_dict['location']['value']['coordinates'][1], output_dict['location']['value']['coordinates'][0]]
+    output_dict['id'] = output_dict['id'].split('-')[1]
     return output_dict
 
 
@@ -310,6 +310,7 @@ def calculate_best_route(request):
     distance_position = {}
     for element in stations_json:
         station_location = element['location']['value']['coordinates']
+        station_location = [station_location[1], station_location[0]]
         distance_position[element['id']] = haversine(
                 (float(location[0]), float(location[1])),
                 (float(station_location[0]), float(station_location[1]))
