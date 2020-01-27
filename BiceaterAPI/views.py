@@ -333,11 +333,10 @@ def calculate_best_route(request):
 def search_station_by_address(request):
     address = json.loads(request.body)['stationAddress']
     stations_json = datos_abiertos()
-    stations = [element for element in stations_json if str.lower(re.sub(r'[_]+', ' ', element['address']['value']['streetAddress'])).__contains__(str.lower(address))]
+    stations = [element for element in stations_json if str.lower(element['address']['value']['streetAddress'])
+        .__contains__(str.lower(address))]
     for element in stations:
-        element['address']['value']['streetAddress'] = re.sub(r'[_]+', ' ',
-                                                              element['address']['value']['streetAddress'])
-        element['id'] = element['id'].split(':')[3]
+        element['id'] = element['id'].split('-')[1]
     return stations
 
 
